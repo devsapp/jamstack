@@ -1,0 +1,69 @@
+Type: Component
+Name: jamstack
+Provider:
+  - 其它
+Version: 0.0.15
+Description: 构建jamstack 站点
+HomePage: https://github.com/devsapp/jamstack
+Tags: #标签详情
+  - jamstack
+Category: 其它
+Commands:
+  deploy: 部署jamstack应用
+Properties:
+  domain:
+    Description: 域名
+    Required: true
+    Type: 
+      - String
+  favicon:
+    Description: 是否使用favicon
+    Required: false
+    Type: 
+      - Boolean
+    Default: false
+  apps:
+    Description: 应用
+    Required: true
+    Type:
+      - List<Struct>:
+          name: 
+            Description: '名称'
+            Type:
+              - String
+            Required: true
+          type:
+            Description: '名称'
+            Type:
+              - String
+            Required: true
+          sourceCode:
+            Description: '源码地址'
+            Type:
+              - String
+            Required: false
+          releaseCode:
+            Description: '构建好的静态资源地址'
+            Type:
+              - String
+            Required: false
+          paths:
+            Description: '路由'
+            Type:
+              - List<String>
+            Required: false
+          indexFile:
+            Description: '首页文件'
+            Type:
+              - String
+            Required: true
+          page404Url:
+            Description: '404展示文件'
+            Type:
+              - String
+            Required: true
+          proxyUrl:
+            Description: '代理地址'
+            Type:
+              - String
+            Required: true
