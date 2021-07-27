@@ -12,6 +12,7 @@ import { createProject, updateProject, getProjectInfo } from './common/request';
 const Host = 's.devsapp.cn';
 const CONTENT_TYPE_MAP = {
   'html': 'text/html; charset=UTF-8',
+  'htm': 'text/html; charset=UTF-8',
   'text': 'text/plain; charset=UTF-8',
   'xml': 'text/xml; charset=UTF-8',
   'gif': 'image/gif; charset=UTF-8',
@@ -24,7 +25,9 @@ const CONTENT_TYPE_MAP = {
   'pdf': 'application/pdf; charset=UTF-8',
   'js': 'application/javascript; charset=UTF-8',
   'css': 'text/css; charset=UTF-8',
-  'wasm': 'application/wasm'
+  'md': 'text/markdown; charset=UTF-8',
+  'wasm': 'application/wasm',
+  'zip': 'application/x-zip'
 }
 const MAX_FILE_SIZE = 10485760;
 export default class ComponentDemo extends BaseComponent {
