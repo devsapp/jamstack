@@ -22,6 +22,7 @@ const CONTENT_TYPE_MAP = {
   'svg': 'image/svg+xml; charset=UTF-8',
   'xhtml': 'application/xhtml+xml; charset=UTF-8',
   'json': 'application/json; charset=UTF-8',
+  'yaml': 'application/x-yaml; charset=UTF-8',
   'map': 'application/json; charset=UTF-8',
   'pdf': 'application/pdf; charset=UTF-8',
   'js': 'application/javascript; charset=UTF-8',
