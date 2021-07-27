@@ -23,7 +23,8 @@ const CONTENT_TYPE_MAP = {
   'json': 'application/json; charset=UTF-8',
   'pdf': 'application/pdf; charset=UTF-8',
   'js': 'application/javascript; charset=UTF-8',
-  'css': 'text/css; charset=UTF-8'
+  'css': 'text/css; charset=UTF-8',
+  'wasm': 'application/wasm'
 }
 const MAX_FILE_SIZE = 10485760;
 export default class ComponentDemo extends BaseComponent {
