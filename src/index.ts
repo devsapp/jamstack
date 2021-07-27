@@ -14,6 +14,7 @@ const CONTENT_TYPE_MAP = {
   'html': 'text/html; charset=UTF-8',
   'htm': 'text/html; charset=UTF-8',
   'text': 'text/plain; charset=UTF-8',
+  'txt': 'text/plain; charset=UTF-8',
   'xml': 'text/xml; charset=UTF-8',
   'gif': 'image/gif; charset=UTF-8',
   'jpg': 'image/jpeg; charset=UTF-8',
