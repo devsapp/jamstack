@@ -1,6 +1,6 @@
 {
   "name": "jamstack",
-  "version": "0.0.10",
+  "version": "0.0.17",
   "description": "This is a component demo for Serverless Devs Tool ",
   "keywords": [
     "Serverless",
@@ -24,7 +24,7 @@
   "scripts": {
     "start": "npm run watch",
     "watch": "npm run doc && tsc -w",
-    "publish": "npm run build && s cli platform publish",
+    "publish": "npm run build && s cli platform@0.0.16 publish",
     "build": "tsc",
     "postbuild": "npm run doc",
     "doc": "npx typedoc src/index.ts --json doc/doc.json --out doc"
