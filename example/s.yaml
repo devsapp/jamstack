@@ -1,13 +1,17 @@
-edition: 1.0.0        #  命令行YAML规范版本，遵循语义化版本（Semantic Versioning）规范
-name: compoent-test   #  项目名称
-vars: # [全局变量，提供给各个服务使用]
-  logo: https://image.aliyun.com/xxxx.png
-  domain: xxxx.yyy.com
+edition: 1.0.0
+name: x-resume-site # 项目的名称，请进行调整
+vars:
+  domain: x.resume.net.cn  # 项目的域名，请调整为合法的域名
 services:
-  component-test: #  服务名称
-    component: ${path(..)}  # 这里引入的是相对路径，正式配置替换成你自己的component名称即可 
+  frontend: 
+    component: jamstack
     props:
-      name: ${component-test2.props.name}
-      otherInput: ${component-test2.output.hello}
-      envshow: ${env(USER)}
-     
+      domain: ${vars.domain}
+      defaultApp: portal
+      apps:
+        - name: portal
+          type: jamstack
+          releaseCode: dist # 应用的内容发布目录
+          paths:
+            - /
+          indexFile: index.html
