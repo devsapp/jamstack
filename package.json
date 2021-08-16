@@ -28,7 +28,7 @@
     "build": "tsc",
     "postbuild": "npm run doc",
     "doc": "npx typedoc src/index.ts --json doc/doc.json --out doc",
-    "format": "prettier --write ./src/**/*.{ts}"
+    "format": "prettier --write ./src/**/*.ts"
   },
   "dependencies": {
     "@serverless-devs/core": "^0.0.*",
