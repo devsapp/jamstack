@@ -9,6 +9,7 @@ import logger from './common/logger';
 import { getJwtoken, getUploadUrl } from './common/jwt-token';
 import { ICredentials, InputProps } from './common/entity';
 import { createProject, getProjectInfo, updateProject } from './common/request';
+// import i18n from './common/i18n';
 
 const Host = 's.devsapp.cn';
 const CONTENT_TYPE_MAP = {
@@ -17,6 +18,8 @@ const CONTENT_TYPE_MAP = {
   text: 'text/plain; charset=UTF-8',
   txt: 'text/plain; charset=UTF-8',
   xml: 'text/xml; charset=UTF-8',
+  rss: 'application/rss+xml; charset=UTF-8',
+  atom: 'application/atom+xml; charset=UTF-8',
   gif: 'image/gif; charset=UTF-8',
   jpg: 'image/jpeg; charset=UTF-8',
   jpeg: 'image/jpeg; charset=UTF-8',
@@ -32,6 +35,9 @@ const CONTENT_TYPE_MAP = {
   md: 'text/markdown; charset=UTF-8',
   wasm: 'application/wasm',
   zip: 'application/x-zip',
+  mp3: 'audio/mpeg',
+  ogg: 'video/ogg',
+  mp4: 'video/mp4',
 };
 const MAX_FILE_SIZE = 10485760;
 const CACHE_RULE_REGEXP = new RegExp('[\\-._a-f\\d][a-f\\d]{8}.(js|css|woff|woff2)$');
