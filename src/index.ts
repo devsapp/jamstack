@@ -130,7 +130,13 @@ export default class ComponentDemo extends BaseComponent {
   private async uploadFiles(filePath, payload, sourceFolder?) {
     let _shortName = payload.fileName;
     if (!payload.fileName) {
-      _shortName = filePath.replace(sourceFolder + '/', '');
+      if (process.platform === 'win32') {
+        let tmpFilePath = filePath.replace(/\\/g, '/');
+        _shortName = tmpFilePath.replace(sourceFolder + '/', '');
+      } else {
+        _shortName = filePath.replace(sourceFolder + '/', '');
+      }
+
       payload.fileName = _shortName;
     }
     const contentType = CONTENT_TYPE_MAP[path.extname(filePath).substr(1)] || 'text/plain; charset=UTF-8';
@@ -280,6 +286,7 @@ export default class ComponentDemo extends BaseComponent {
       this.setEnv(credentials);
       const result = await createProject(domain);
       if (result.success) {
+        logger.info(`新应用创建成功 ，开始进行文件上传... \n\n`);
         const project = result.data.id;
         await new Promise(async (resolve, reject) => {
           setTimeout(async () => {
@@ -291,7 +298,7 @@ export default class ComponentDemo extends BaseComponent {
               defaultApp,
             });
             resolve('');
-          }, 3000);
+          }, 4000)
         });
       } else if (result.msg.indexOf('AppSync-100501') !== -1) {
         // 已经存在域名
@@ -305,6 +312,8 @@ export default class ComponentDemo extends BaseComponent {
           favicon,
           defaultApp,
         });
+      } else {
+        throw Error(result.msg)
       }
       const result_domain = `https://${domain}`;
       const successInfo = [`部署成功,访问域名: ${result_domain}`, '部署信息：', yaml.dump(inputs.props)].join('\n');
