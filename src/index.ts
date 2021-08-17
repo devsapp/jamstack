@@ -220,7 +220,7 @@ export default class ComponentDemo extends BaseComponent {
 
   private async checkAndUploadFiles({ apps, domain }) {
     const allAppFunction = [];
-    apps.forEach(async (item, i) => {
+    apps.forEach((item, i) => {
       const promiseFunction = new Promise(async (resolve, reject) => {
         try {
           const appName = item.name;
@@ -280,6 +280,7 @@ export default class ComponentDemo extends BaseComponent {
   }
 
   public async deploy(inputs: InputProps) {
+    //const dryRun = inputs.args.indexOf("--dry-run") >=0;
     const { domain, apps, defaultApp, favicon } = inputs.props;
     try {
       const credentials = inputs.credentials;
