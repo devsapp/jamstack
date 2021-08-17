@@ -286,7 +286,7 @@ export default class ComponentDemo extends BaseComponent {
   }
 
   public async deploy(inputs: InputProps) {
-    //const dryRun = inputs.args.indexOf("--dry-run") >=0;
+    //process.env.dryRun = (inputs.args.indexOf('--dry-run') >= 0).toString();
     const { domain, apps, defaultApp, favicon } = inputs.props;
     try {
       const credentials = inputs.credentials;
@@ -305,7 +305,7 @@ export default class ComponentDemo extends BaseComponent {
               defaultApp,
             });
             resolve('');
-          }, 4000)
+          }, 4000);
         });
       } else if (result.msg.indexOf('AppSync-100501') !== -1) {
         // 已经存在域名
@@ -320,7 +320,7 @@ export default class ComponentDemo extends BaseComponent {
           defaultApp,
         });
       } else {
-        throw Error(result.msg)
+        throw Error(result.msg);
       }
       const result_domain = `https://${domain}`;
       const successInfo = [`部署成功,访问域名: ${result_domain}`, '部署信息：', yaml.dump(inputs.props)].join('\n');
