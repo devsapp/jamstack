@@ -27,7 +27,8 @@
     "publish": "npm run build && s cli platform@0.0.16 publish",
     "build": "tsc",
     "postbuild": "npm run doc",
-    "doc": "npx typedoc src/index.ts --json doc/doc.json --out doc"
+    "doc": "npx typedoc src/index.ts --json doc/doc.json --out doc",
+    "format": "prettier --write ./src/**/*.ts"
   },
   "dependencies": {
     "@serverless-devs/core": "^0.0.*",
@@ -44,6 +45,7 @@
     "@typescript-eslint/eslint-plugin": "^3.10.0",
     "@typescript-eslint/parser": "^3.10.0",
     "eslint": "^7.7.0",
+    "prettier": "^2.3.2",
     "ts-node": "^8.10.2",
     "typedoc": "^0.20.35",
     "typescript": "^3.9.7"
