@@ -2,7 +2,7 @@ Type: Component
 Name: jamstack
 Provider:
   - 其它
-Version: 0.0.17
+Version: 0.0.19
 Description: 构建jamstack 站点
 HomePage: https://github.com/devsapp/jamstack
 Tags: #标签详情

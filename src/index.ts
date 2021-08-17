@@ -72,8 +72,15 @@ function isLegalCacheFile(absoluteFilePath: string): boolean {
 }
 
 export default class ComponentDemo extends BaseComponent {
+  protected ignoreFiles = [];
   constructor(props) {
     super(props);
+    const signorePath = path.join(process.cwd(), '.signore');
+    if (fs.existsSync(signorePath)) {
+      const signoreContent = fs.readFileSync(signorePath, 'utf-8');
+      this.ignoreFiles = signoreContent.split('\n')
+    }
+
   }
 
   private setEnv(credentials: ICredentials) {
@@ -124,12 +131,15 @@ export default class ComponentDemo extends BaseComponent {
   private travelAsync(dir, filesArr = []) {
     const folders = fs.readdirSync(dir);
     folders.forEach((file) => {
-      const pathname = path.join(dir, file);
-      if (fs.statSync(pathname).isDirectory()) {
-        return this.travelAsync(pathname, filesArr);
-      } else {
-        filesArr.push(pathname);
+      if (!this.ignoreFiles.includes(file)) {
+        const pathname = path.join(dir, file);
+        if (fs.statSync(pathname).isDirectory()) {
+          return this.travelAsync(pathname, filesArr);
+        } else {
+          filesArr.push(pathname);
+        }
       }
+
     });
     return filesArr;
   }
@@ -288,6 +298,7 @@ export default class ComponentDemo extends BaseComponent {
 
   public async deploy(inputs: InputProps) {
     //process.env.dryRun = (inputs.args.indexOf('--dry-run') >= 0).toString();
+
     const { domain, apps, defaultApp, favicon } = inputs.props;
     try {
       const credentials = inputs.credentials;
