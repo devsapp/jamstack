@@ -71,6 +71,16 @@ function isLegalCacheFile(absoluteFilePath: string): boolean {
   return false;
 }
 
+function formatBytes(bytes: number, decimals = 2): string {
+  if (bytes === 0) return '0 Bytes';
+  const k = 1024;
+  const dm = decimals < 0 ? 0 : decimals;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+}
+
+
 export default class ComponentDemo extends BaseComponent {
   constructor(props) {
     super(props);
@@ -135,7 +145,7 @@ export default class ComponentDemo extends BaseComponent {
   }
 
   private async uploadFiles(filePath, payload, sourceFolder?) {
-    let _shortName = payload.fileName;
+    let _shortName: string = payload.fileName;
     if (!payload.fileName) {
       if (process.platform === 'win32') {
         let tmpFilePath = filePath.replace(/\\/g, '/');
@@ -168,15 +178,15 @@ export default class ComponentDemo extends BaseComponent {
           headers: headers,
         });
         if (res.status === 200) {
-          logger.info(`${_shortName} file upload success`);
+          console.log(`${_shortName.padEnd(60)} ${formatBytes(fileState.size).padStart(10)} Succeeded ${cachedFile?'Cached':''}`);
         } else {
-          logger.error(`${_shortName} file upload error`);
+          logger.fatal(`${_shortName.padEnd(60)} ${formatBytes(fileState.size).padStart(10)} Failed`);
         }
       } else {
-        logger.error(`${_shortName} files over 10M cannot be uploaded`);
+        logger.fatal(`${_shortName.padEnd(60)} ${formatBytes(fileState.size).padStart(10)} Failed    Over 10M `);
       }
     } catch (e) {
-      logger.error(`${_shortName} file upload failed the result is ${e.message}`);
+      logger.fatal(`${_shortName} Failed    ${e.message}`);
     }
   }
 
@@ -236,6 +246,7 @@ export default class ComponentDemo extends BaseComponent {
 
   private async checkAndUploadFiles({ apps, domain }) {
     const allAppFunction = [];
+    logger.info('Begin to upload the files');
     apps.forEach((item, i) => {
       const promiseFunction = new Promise(async (resolve, reject) => {
         try {
@@ -269,7 +280,7 @@ export default class ComponentDemo extends BaseComponent {
             }
           } else if (fs.existsSync(releaseCode)) {
             // 如果有直接指定静态文件直接进行上传
-
+            logger.info(`Begin to upload the files for app: ${appName}`);
             const files = this.travelAsync(releaseCode);
             const promiseArr = [];
             files.forEach((fileName) => {
@@ -281,7 +292,7 @@ export default class ComponentDemo extends BaseComponent {
               );
             });
             await Promise.all(promiseArr);
-            logger.info(`-----【${appName}】 upload completed ----- \n\n`);
+            logger.info(`Succeed to upload the files for app: ${appName}`);
             resolve(i);
           } else {
             resolve(i);
