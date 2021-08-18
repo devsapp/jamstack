@@ -61,11 +61,9 @@ function isLegalCacheFile(absoluteFilePath: string): boolean {
   }
   const extName = fileName.substring(fileName.lastIndexOf('.') + 1);
   if (CACHED_PATHS.find((whitePath) => absoluteFilePath.indexOf(whitePath) >= 0)) {
-    logger.info(`File cached by path matched: ${absoluteFilePath}`);
     return true;
   }
   if (fileName.length >= CACHED_FILE_NAME_MIN_LEN && CACHED_EXT_NAMES.includes(extName)) {
-    logger.info(`File cached by name matched: ${fileName}`);
     return CACHE_RULE_REGEXP.test(fileName);
   }
   return false;
