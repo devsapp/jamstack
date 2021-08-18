@@ -8,7 +8,7 @@ import BaseComponent from './common/base';
 import logger from './common/logger';
 import { getJwtoken, getUploadUrl } from './common/jwt-token';
 import { ICredentials, InputProps } from './common/entity';
-import { createProject, getProjectInfo, updateProject } from './common/request';
+import { createProject, verifyProject, updateProject } from './common/request';
 // import i18n from './common/i18n';
 
 const Host = 's.devsapp.cn';
@@ -287,41 +287,48 @@ export default class ComponentDemo extends BaseComponent {
   }
 
   public async deploy(inputs: InputProps) {
-    //process.env.dryRun = (inputs.args.indexOf('--dry-run') >= 0).toString();
+    process.env.dryRun = (inputs.args.indexOf('--dry-run') >= 0).toString();
     const { domain, apps, defaultApp, favicon } = inputs.props;
     try {
       const credentials = inputs.credentials;
       this.setEnv(credentials);
-      const result = await createProject(domain);
-      if (result.success) {
-        logger.info(`新应用创建成功 ，开始进行文件上传... \n\n`);
-        const project = result.data.id;
-        await new Promise(async (resolve, reject) => {
-          setTimeout(async () => {
-            await this.updateProjectInfo({
-              apps,
-              project,
-              domain,
-              favicon,
-              defaultApp,
-            });
-            resolve('');
-          }, 4000);
-        });
-      } else if (result.msg.indexOf('AppSync-100501') !== -1) {
-        // 已经存在域名
-        const projectInfo = await getProjectInfo({
-          domain,
-        });
-        await this.updateProjectInfo({
-          apps,
-          project: projectInfo.id,
-          domain,
-          favicon,
-          defaultApp,
-        });
+      const verifyResult = await verifyProject(domain);
+      if (!verifyResult.success) {
+        // domain owned by other developer
+        throw Error(verifyResult.msg);
       } else {
-        throw Error(result.msg);
+        if (verifyResult.data && verifyResult.data.project) {
+          // project already created by you
+          const projectInfo = verifyResult.data.project;
+          await this.updateProjectInfo({
+            apps,
+            project: projectInfo.id,
+            domain,
+            favicon,
+            defaultApp,
+          });
+        } else {
+          // you can create project with this domain
+          const result = await createProject(domain);
+          if (result.success) {
+            logger.info(`新应用创建成功 ，开始进行文件上传... \n\n`);
+            const project = result.data.id;
+            await new Promise(async (resolve, reject) => {
+              setTimeout(async () => {
+                await this.updateProjectInfo({
+                  apps,
+                  project,
+                  domain,
+                  favicon,
+                  defaultApp,
+                });
+                resolve('');
+              }, 4000);
+            });
+          } else {
+            throw Error(result.msg);
+          }
+        }
       }
       const result_domain = `https://${domain}`;
       const successInfo = [`部署成功,访问域名: ${result_domain}`, '部署信息：', yaml.dump(inputs.props)].join('\n');
