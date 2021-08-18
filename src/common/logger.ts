@@ -30,4 +30,8 @@ export default class ComponentLogger {
   static success(m) {
     Logger.log(m, 'green');
   }
+
+  static fatal(m) {
+    Logger.log(m, 'red');
+  }
 }
