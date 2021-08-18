@@ -172,6 +172,12 @@ export default class ComponentDemo extends BaseComponent {
         if (cachedFile) {
           headers['Cache-Control'] = 'public, max-age=31536000';
         }
+        // hint, such as cached, optimize file size
+        let hint = cachedFile ? 'Cached ' : '';
+        if (fileState.size >= 2097152) {
+          // file size more than 2 MB
+          hint = hint + 'Optimize file size';
+        }
         const stream = fs.createReadStream(filePath);
         const res = await nodeFetch(uploadUrl, {
           method: 'POST',
@@ -180,7 +186,7 @@ export default class ComponentDemo extends BaseComponent {
           headers: headers,
         });
         if (res.status === 200) {
-          console.log(`${_shortName.padEnd(60)} ${formatBytes(fileState.size).padStart(10)} Succeeded ${cachedFile ? 'Cached' : ''}`);
+          console.log(`${_shortName.padEnd(60)} ${formatBytes(fileState.size).padStart(10)} Succeeded ${hint}`);
         } else {
           logger.fatal(`${_shortName.padEnd(60)} ${formatBytes(fileState.size).padStart(10)} Failed`);
         }
