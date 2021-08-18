@@ -43,7 +43,6 @@ const CONTENT_TYPE_MAP = {
 const MAX_FILE_SIZE = 10485760;
 const CACHE_RULE_REGEXP = new RegExp('[\\-._a-f\\d][a-f\\d]{8}.(js|css|woff|woff2)$');
 const CACHED_PATHS = ['/_nuxt/', '/_snowpack/', '/51cache/'];
-const CACHED_EXT_NAMES = ['js', 'css', 'woff', 'woff2'];
 const CACHED_FILE_NAME_MIN_LEN = 19;
 
 /**
@@ -52,18 +51,11 @@ const CACHED_FILE_NAME_MIN_LEN = 19;
  * @return  可以被缓存标识
  */
 function isLegalCacheFile(absoluteFilePath: string): boolean {
-  let fileName = absoluteFilePath;
-  if (fileName.indexOf('/') >= 0) {
-    fileName = fileName.substring(fileName.lastIndexOf('/'));
-  }
-  if (fileName.lastIndexOf('.') <= 0) {
-    return false;
-  }
-  const extName = fileName.substring(fileName.lastIndexOf('.') + 1);
+  let fileName = path.posix.basename(absoluteFilePath);
   if (CACHED_PATHS.find((whitePath) => absoluteFilePath.indexOf(whitePath) >= 0)) {
     return true;
   }
-  if (fileName.length >= CACHED_FILE_NAME_MIN_LEN && CACHED_EXT_NAMES.includes(extName)) {
+  if (fileName.length >= CACHED_FILE_NAME_MIN_LEN) {
     return CACHE_RULE_REGEXP.test(fileName);
   }
   return false;
