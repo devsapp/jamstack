@@ -180,6 +180,9 @@ export default class ComponentDemo extends BaseComponent {
     }
   }
 
+  /**
+   * update project metadata and upload the files
+   */
   private async updateProjectInfo({ apps, project, domain, favicon, defaultApp }) {
     const copyApps = _.cloneDeepWith(apps);
     apps.forEach((app) => {
@@ -198,12 +201,18 @@ export default class ComponentDemo extends BaseComponent {
         apps,
       },
     };
-    const updateResult = await updateProject(updatePayload); // 更新应用元数据信息
+    // upload the files first
+    await this.checkAndUploadFiles({
+      apps: copyApps,
+      domain,
+    });
+    // update project metadata
+    const updateResult = await updateProject(updatePayload);
     if (updateResult.success) {
-      await this.checkAndUploadFiles({
-        apps: copyApps,
-        domain,
-      });
+      logger.info(`Succeed to update project metadata.`);
+      //todo delete the stale files
+    } else {
+      logger.error(`Failed to update project metadata.`);
     }
   }
 
