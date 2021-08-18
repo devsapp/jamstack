@@ -41,7 +41,7 @@ const CONTENT_TYPE_MAP = {
   mp4: 'video/mp4',
 };
 const MAX_FILE_SIZE = 10485760;
-const CACHE_RULE_REGEXP = new RegExp('[\\-._a-f\\d][a-f\\d]{8}.(js|css|woff|woff2)$');
+const CACHE_RULE_REGEXP = new RegExp('[\\-._a-f\\d][a-f\\d]{8}.(js|css|woff|woff2|jpg|jpeg|png|svg)$');
 const CACHED_PATHS = ['/_nuxt/', '/_snowpack/', '/51cache/'];
 const CACHED_FILE_NAME_MIN_LEN = 19;
 
