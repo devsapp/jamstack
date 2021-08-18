@@ -72,14 +72,14 @@ function formatBytes(bytes: number, decimals = 2): string {
 
 export default class ComponentDemo extends BaseComponent {
   protected ignoreFiles = [];
+
   constructor(props) {
     super(props);
     const signorePath = path.join(process.cwd(), '.signore');
     if (fs.existsSync(signorePath)) {
       const signoreContent = fs.readFileSync(signorePath, 'utf-8');
-      this.ignoreFiles = signoreContent.split('\n')
+      this.ignoreFiles = signoreContent.split('\n');
     }
-
   }
 
   private setEnv(credentials: ICredentials) {
@@ -138,7 +138,6 @@ export default class ComponentDemo extends BaseComponent {
           filesArr.push(pathname);
         }
       }
-
     });
     return filesArr;
   }
@@ -290,17 +289,22 @@ export default class ComponentDemo extends BaseComponent {
             // 如果有直接指定静态文件直接进行上传
             logger.info(`Begin to upload the files for app: ${appName}`);
             const files = this.travelAsync(releaseCode);
-            const promiseArr = [];
-            files.forEach((fileName) => {
-              promiseArr.push(
-                new Promise(async (resolve, reject) => {
-                  await this.uploadFiles(fileName, { domain, appName }, releaseCode);
-                  resolve('');
-                }),
-              );
-            });
-            await Promise.all(promiseArr);
-            logger.info(`Succeed to upload the files for app: ${appName}`);
+            if (files.length <= 10000) {
+              //文件数超过10000
+              const promiseArr = [];
+              files.forEach((fileName) => {
+                promiseArr.push(
+                  new Promise(async (resolve, reject) => {
+                    await this.uploadFiles(fileName, { domain, appName }, releaseCode);
+                    resolve('');
+                  }),
+                );
+              });
+              await Promise.all(promiseArr);
+              logger.info(`Succeed to upload the files for app: ${appName}`);
+            } else {
+              logger.error(`Failed to upload files for ${appName}: the files number ${files.length} more than 10000`);
+            }
             resolve(i);
           } else {
             resolve(i);
