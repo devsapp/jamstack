@@ -37,6 +37,7 @@ s cli jamstack --help
 
 ### 相关限制
 
+* 当个Jamstack应用的文件数不能超过10000
 * 文件不能超过10M
 * 不支持上传隐藏文件，也就是"."开头的文件，如 `.gitignore` 等
 * 浏览器端缓存规则，即自动添加 `Cache-Control: public, max-age=31536000` HTTP头，实现流量端缓存。
