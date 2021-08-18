@@ -217,10 +217,10 @@ export default class ComponentDemo extends BaseComponent {
     // update project metadata
     const updateResult = await updateProject(updatePayload);
     if (updateResult.success) {
-      logger.info(`Succeed to update project metadata.`);
+      logger.info(`Succeed to update project metadata`);
       //todo delete the stale files
     } else {
-      logger.error(`Failed to update project metadata.`);
+      logger.error(`Failed to update project metadata`);
     }
   }
 
@@ -329,7 +329,7 @@ export default class ComponentDemo extends BaseComponent {
           // you can create project with this domain
           const result = await createProject(domain);
           if (result.success) {
-            logger.info(`新应用创建成功 ，开始进行文件上传... \n\n`);
+            logger.info(`Succeed to create the project`);
             const project = result.data.id;
             await new Promise(async (resolve, reject) => {
               setTimeout(async () => {
@@ -349,7 +349,7 @@ export default class ComponentDemo extends BaseComponent {
         }
       }
       const result_domain = `https://${domain}`;
-      const successInfo = [`部署成功,访问域名: ${result_domain}`, '部署信息：', yaml.dump(inputs.props)].join('\n');
+      const successInfo = [`部署成功! 访问域名: ${result_domain}`, '部署信息：', yaml.dump(inputs.props)].join('\n');
       super.__report({
         name: 'domain',
         content: {
