@@ -78,7 +78,6 @@ function formatBytes(bytes: number, decimals = 2): string {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 }
 
-
 export default class ComponentDemo extends BaseComponent {
   constructor(props) {
     super(props);
@@ -154,6 +153,11 @@ export default class ComponentDemo extends BaseComponent {
 
       payload.fileName = _shortName;
     }
+    // ignore the hidden file that start with '.'
+    if (path.posix.basename(filePath).startsWith('.')) {
+      logger.fatal(`${_shortName.padEnd(71)} Ignored`);
+      return;
+    }
     const contentType = CONTENT_TYPE_MAP[path.extname(filePath).substr(1)] || 'text/plain; charset=UTF-8';
     const uploadUrl = getUploadUrl(payload);
     try {
@@ -176,7 +180,7 @@ export default class ComponentDemo extends BaseComponent {
           headers: headers,
         });
         if (res.status === 200) {
-          console.log(`${_shortName.padEnd(60)} ${formatBytes(fileState.size).padStart(10)} Succeeded ${cachedFile?'Cached':''}`);
+          console.log(`${_shortName.padEnd(60)} ${formatBytes(fileState.size).padStart(10)} Succeeded ${cachedFile ? 'Cached' : ''}`);
         } else {
           logger.fatal(`${_shortName.padEnd(60)} ${formatBytes(fileState.size).padStart(10)} Failed`);
         }
@@ -184,7 +188,7 @@ export default class ComponentDemo extends BaseComponent {
         logger.fatal(`${_shortName.padEnd(60)} ${formatBytes(fileState.size).padStart(10)} Failed    Over 10M `);
       }
     } catch (e) {
-      logger.fatal(`${_shortName} Failed    ${e.message}`);
+      logger.fatal(`${_shortName.padEnd(71)} Failed    ${e.message}`);
     }
   }
 
@@ -196,7 +200,6 @@ export default class ComponentDemo extends BaseComponent {
     apps.forEach((app) => {
       app.sourceCode && delete app.sourceCode;
       app.releaseCode && delete app.releaseCode;
-      app.redirects && delete app.redirects;
     });
     const updatePayload = {
       domain,
