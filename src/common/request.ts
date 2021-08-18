@@ -18,6 +18,15 @@ export const createProject = async (domain: string) =>
     method: 'POST',
   });
 
+/**
+ * verify project
+ * @param domain
+ */
+export const verifyProject = async (domain: string) =>
+    getJwtToken(`/project/verify/${domain}`, {
+        method: 'POST',
+    });
+
 export const updateProject = async (payload: IUpdateProjectPayload) =>
   getJwtToken(`/project/update/${payload.domain}`, {
     method: 'POST',
