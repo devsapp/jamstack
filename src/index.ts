@@ -71,8 +71,15 @@ function formatBytes(bytes: number, decimals = 2): string {
 }
 
 export default class ComponentDemo extends BaseComponent {
+  protected ignoreFiles = [];
   constructor(props) {
     super(props);
+    const signorePath = path.join(process.cwd(), '.signore');
+    if (fs.existsSync(signorePath)) {
+      const signoreContent = fs.readFileSync(signorePath, 'utf-8');
+      this.ignoreFiles = signoreContent.split('\n')
+    }
+
   }
 
   private setEnv(credentials: ICredentials) {
@@ -123,12 +130,15 @@ export default class ComponentDemo extends BaseComponent {
   private travelAsync(dir, filesArr = []) {
     const folders = fs.readdirSync(dir);
     folders.forEach((file) => {
-      const pathname = path.join(dir, file);
-      if (fs.statSync(pathname).isDirectory()) {
-        return this.travelAsync(pathname, filesArr);
-      } else {
-        filesArr.push(pathname);
+      if (!this.ignoreFiles.includes(file)) {
+        const pathname = path.join(dir, file);
+        if (fs.statSync(pathname).isDirectory()) {
+          return this.travelAsync(pathname, filesArr);
+        } else {
+          filesArr.push(pathname);
+        }
       }
+
     });
     return filesArr;
   }
