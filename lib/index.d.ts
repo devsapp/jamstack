@@ -6,6 +6,9 @@ export default class ComponentDemo extends BaseComponent {
     private travel;
     private travelAsync;
     private uploadFiles;
+    /**
+     * update project metadata and upload the files
+     */
     private updateProjectInfo;
     private exeBuildWebStaticCmd;
     private checkAndUploadFiles;
