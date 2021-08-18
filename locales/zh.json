@@ -1,4 +1,4 @@
 {
-	"deploy test": "部署测试"
-
+  "Succeed to create the project": "项目创建成功",
+  "Succeed to update project metadata": "成功更新项目元信息"
 }
