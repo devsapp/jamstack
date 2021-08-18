@@ -253,7 +253,6 @@ export default class ComponentDemo extends BaseComponent {
 
   private async checkAndUploadFiles({ apps, domain }) {
     const allAppFunction = [];
-    logger.info('Begin to upload the files');
     apps.forEach((item, i) => {
       const promiseFunction = new Promise(async (resolve, reject) => {
         try {
