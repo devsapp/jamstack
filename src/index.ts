@@ -8,7 +8,7 @@ import BaseComponent from './common/base';
 import logger from './common/logger';
 import { getJwtoken, getUploadUrl } from './common/jwt-token';
 import { ICredentials, InputProps } from './common/entity';
-import { createProject, getProjectInfo, updateProject } from './common/request';
+import { createProject, verifyProject, updateProject } from './common/request';
 // import i18n from './common/i18n';
 
 const Host = 's.devsapp.cn';
@@ -41,9 +41,8 @@ const CONTENT_TYPE_MAP = {
   mp4: 'video/mp4',
 };
 const MAX_FILE_SIZE = 10485760;
-const CACHE_RULE_REGEXP = new RegExp('[\\-._a-f\\d][a-f\\d]{8}.(js|css|woff|woff2)$');
+const CACHE_RULE_REGEXP = new RegExp('[\\-._a-f\\d][a-f\\d]{8}.(js|css|woff|woff2|jpg|jpeg|png|svg)$');
 const CACHED_PATHS = ['/_nuxt/', '/_snowpack/', '/51cache/'];
-const CACHED_EXT_NAMES = ['js', 'css', 'woff', 'woff2'];
 const CACHED_FILE_NAME_MIN_LEN = 19;
 
 /**
@@ -52,35 +51,35 @@ const CACHED_FILE_NAME_MIN_LEN = 19;
  * @return  可以被缓存标识
  */
 function isLegalCacheFile(absoluteFilePath: string): boolean {
-  let fileName = absoluteFilePath;
-  if (fileName.indexOf('/') >= 0) {
-    fileName = fileName.substring(fileName.lastIndexOf('/'));
-  }
-  if (fileName.lastIndexOf('.') <= 0) {
-    return false;
-  }
-  const extName = fileName.substring(fileName.lastIndexOf('.') + 1);
+  let fileName = path.posix.basename(absoluteFilePath);
   if (CACHED_PATHS.find((whitePath) => absoluteFilePath.indexOf(whitePath) >= 0)) {
-    logger.info(`File cached by path matched: ${absoluteFilePath}`);
     return true;
   }
-  if (fileName.length >= CACHED_FILE_NAME_MIN_LEN && CACHED_EXT_NAMES.includes(extName)) {
-    logger.info(`File cached by name matched: ${fileName}`);
+  if (fileName.length >= CACHED_FILE_NAME_MIN_LEN) {
     return CACHE_RULE_REGEXP.test(fileName);
   }
   return false;
 }
 
+function formatBytes(bytes: number, decimals = 2): string {
+  if (bytes === 0) return '0 Bytes';
+  const k = 1024;
+  const dm = decimals < 0 ? 0 : decimals;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+}
+
 export default class ComponentDemo extends BaseComponent {
   protected ignoreFiles = [];
+
   constructor(props) {
     super(props);
     const signorePath = path.join(process.cwd(), '.signore');
     if (fs.existsSync(signorePath)) {
       const signoreContent = fs.readFileSync(signorePath, 'utf-8');
-      this.ignoreFiles = signoreContent.split('\n')
+      this.ignoreFiles = signoreContent.split('\n');
     }
-
   }
 
   private setEnv(credentials: ICredentials) {
@@ -139,13 +138,12 @@ export default class ComponentDemo extends BaseComponent {
           filesArr.push(pathname);
         }
       }
-
     });
     return filesArr;
   }
 
   private async uploadFiles(filePath, payload, sourceFolder?) {
-    let _shortName = payload.fileName;
+    let _shortName: string = payload.fileName;
     if (!payload.fileName) {
       if (process.platform === 'win32') {
         let tmpFilePath = filePath.replace(/\\/g, '/');
@@ -155,6 +153,11 @@ export default class ComponentDemo extends BaseComponent {
       }
 
       payload.fileName = _shortName;
+    }
+    // ignore the hidden file that start with '.'
+    if (path.posix.basename(filePath).startsWith('.')) {
+      logger.fatal(`${_shortName.padEnd(71)} Ignored`);
+      return;
     }
     const contentType = CONTENT_TYPE_MAP[path.extname(filePath).substr(1)] || 'text/plain; charset=UTF-8';
     const uploadUrl = getUploadUrl(payload);
@@ -170,6 +173,12 @@ export default class ComponentDemo extends BaseComponent {
         if (cachedFile) {
           headers['Cache-Control'] = 'public, max-age=31536000';
         }
+        // hint, such as cached, optimize file size
+        let hint = cachedFile ? 'Cached ' : '';
+        if (fileState.size >= 2097152) {
+          // file size more than 2 MB
+          hint = hint + 'Optimize file size';
+        }
         const stream = fs.createReadStream(filePath);
         const res = await nodeFetch(uploadUrl, {
           method: 'POST',
@@ -178,24 +187,26 @@ export default class ComponentDemo extends BaseComponent {
           headers: headers,
         });
         if (res.status === 200) {
-          logger.info(`${_shortName} file upload success`);
+          console.log(`${_shortName.padEnd(60)} ${formatBytes(fileState.size).padStart(10)} Succeeded ${hint}`);
         } else {
-          logger.error(`${_shortName} file upload error`);
+          logger.fatal(`${_shortName.padEnd(60)} ${formatBytes(fileState.size).padStart(10)} Failed`);
         }
       } else {
-        logger.error(`${_shortName} files over 10M cannot be uploaded`);
+        logger.fatal(`${_shortName.padEnd(60)} ${formatBytes(fileState.size).padStart(10)} Failed    Over 10M `);
       }
     } catch (e) {
-      logger.error(`${_shortName} file upload failed the result is ${e.message}`);
+      logger.fatal(`${_shortName.padEnd(71)} Failed    ${e.message}`);
     }
   }
 
+  /**
+   * update project metadata and upload the files
+   */
   private async updateProjectInfo({ apps, project, domain, favicon, defaultApp }) {
     const copyApps = _.cloneDeepWith(apps);
     apps.forEach((app) => {
       app.sourceCode && delete app.sourceCode;
       app.releaseCode && delete app.releaseCode;
-      app.redirects && delete app.redirects;
     });
     const updatePayload = {
       domain,
@@ -208,12 +219,18 @@ export default class ComponentDemo extends BaseComponent {
         apps,
       },
     };
-    const updateResult = await updateProject(updatePayload); // 更新应用元数据信息
+    // upload the files first
+    await this.checkAndUploadFiles({
+      apps: copyApps,
+      domain,
+    });
+    // update project metadata
+    const updateResult = await updateProject(updatePayload);
     if (updateResult.success) {
-      await this.checkAndUploadFiles({
-        apps: copyApps,
-        domain,
-      });
+      logger.info(`Succeed to update project metadata`);
+      //todo delete the stale files
+    } else {
+      logger.error(`Failed to update project metadata`);
     }
   }
 
@@ -270,19 +287,24 @@ export default class ComponentDemo extends BaseComponent {
             }
           } else if (fs.existsSync(releaseCode)) {
             // 如果有直接指定静态文件直接进行上传
-
+            logger.info(`Begin to upload the files for app: ${appName}`);
             const files = this.travelAsync(releaseCode);
-            const promiseArr = [];
-            files.forEach((fileName) => {
-              promiseArr.push(
-                new Promise(async (resolve, reject) => {
-                  await this.uploadFiles(fileName, { domain, appName }, releaseCode);
-                  resolve('');
-                }),
-              );
-            });
-            await Promise.all(promiseArr);
-            logger.info(`-----【${appName}】 upload completed ----- \n\n`);
+            if (files.length <= 10000) {
+              //文件数超过10000
+              const promiseArr = [];
+              files.forEach((fileName) => {
+                promiseArr.push(
+                  new Promise(async (resolve, reject) => {
+                    await this.uploadFiles(fileName, { domain, appName }, releaseCode);
+                    resolve('');
+                  }),
+                );
+              });
+              await Promise.all(promiseArr);
+              logger.info(`Succeed to upload the files for app: ${appName}`);
+            } else {
+              logger.error(`Failed to upload files for ${appName}: the files number ${files.length} more than 10000`);
+            }
             resolve(i);
           } else {
             resolve(i);
@@ -297,45 +319,51 @@ export default class ComponentDemo extends BaseComponent {
   }
 
   public async deploy(inputs: InputProps) {
-    //process.env.dryRun = (inputs.args.indexOf('--dry-run') >= 0).toString();
-
+    process.env.dryRun = (inputs.args.indexOf('--dry-run') >= 0).toString();
     const { domain, apps, defaultApp, favicon } = inputs.props;
     try {
       const credentials = inputs.credentials;
       this.setEnv(credentials);
-      const result = await createProject(domain);
-      if (result.success) {
-        logger.info(`新应用创建成功 ，开始进行文件上传... \n\n`);
-        const project = result.data.id;
-        await new Promise(async (resolve, reject) => {
-          setTimeout(async () => {
-            await this.updateProjectInfo({
-              apps,
-              project,
-              domain,
-              favicon,
-              defaultApp,
-            });
-            resolve('');
-          }, 4000);
-        });
-      } else if (result.msg.indexOf('AppSync-100501') !== -1) {
-        // 已经存在域名
-        const projectInfo = await getProjectInfo({
-          domain,
-        });
-        await this.updateProjectInfo({
-          apps,
-          project: projectInfo.id,
-          domain,
-          favicon,
-          defaultApp,
-        });
+      const verifyResult = await verifyProject(domain);
+      if (!verifyResult.success) {
+        // domain owned by other developer
+        throw Error(verifyResult.msg);
       } else {
-        throw Error(result.msg);
+        if (verifyResult.data && verifyResult.data.project) {
+          // project already created by you
+          const projectInfo = verifyResult.data.project;
+          await this.updateProjectInfo({
+            apps,
+            project: projectInfo.id,
+            domain,
+            favicon,
+            defaultApp,
+          });
+        } else {
+          // you can create project with this domain
+          const result = await createProject(domain);
+          if (result.success) {
+            logger.info(`Succeed to create the project`);
+            const project = result.data.id;
+            await new Promise(async (resolve, reject) => {
+              setTimeout(async () => {
+                await this.updateProjectInfo({
+                  apps,
+                  project,
+                  domain,
+                  favicon,
+                  defaultApp,
+                });
+                resolve('');
+              }, 4000);
+            });
+          } else {
+            throw Error(result.msg);
+          }
+        }
       }
       const result_domain = `https://${domain}`;
-      const successInfo = [`部署成功,访问域名: ${result_domain}`, '部署信息：', yaml.dump(inputs.props)].join('\n');
+      const successInfo = [`部署成功! 访问域名: ${result_domain}`, '部署信息：', yaml.dump(inputs.props)].join('\n');
       super.__report({
         name: 'domain',
         content: {

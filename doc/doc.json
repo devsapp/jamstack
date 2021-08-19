@@ -90,7 +90,7 @@
 					"sources": [
 						{
 							"fileName": "index.ts",
-							"line": 75,
+							"line": 74,
 							"character": 23
 						}
 					],
@@ -311,7 +311,7 @@
 					"sources": [
 						{
 							"fileName": "index.ts",
-							"line": 238,
+							"line": 255,
 							"character": 35
 						}
 					],
@@ -362,7 +362,7 @@
 					"sources": [
 						{
 							"fileName": "index.ts",
-							"line": 299,
+							"line": 321,
 							"character": 21
 						}
 					],
@@ -410,7 +410,7 @@
 					"sources": [
 						{
 							"fileName": "index.ts",
-							"line": 220,
+							"line": 237,
 							"character": 36
 						}
 					],
@@ -469,7 +469,7 @@
 					"sources": [
 						{
 							"fileName": "index.ts",
-							"line": 86,
+							"line": 85,
 							"character": 16
 						}
 					],
@@ -511,7 +511,7 @@
 					"sources": [
 						{
 							"fileName": "index.ts",
-							"line": 110,
+							"line": 109,
 							"character": 22
 						}
 					],
@@ -570,7 +570,7 @@
 					"sources": [
 						{
 							"fileName": "index.ts",
-							"line": 131,
+							"line": 130,
 							"character": 21
 						}
 					],
@@ -630,7 +630,7 @@
 					"sources": [
 						{
 							"fileName": "index.ts",
-							"line": 193,
+							"line": 205,
 							"character": 33
 						}
 					],
@@ -641,6 +641,9 @@
 							"kind": 4096,
 							"kindString": "Call signature",
 							"flags": {},
+							"comment": {
+								"shortText": "update project metadata and upload the files"
+							},
 							"parameters": [
 								{
 									"id": 24,
@@ -678,7 +681,7 @@
 					"sources": [
 						{
 							"fileName": "index.ts",
-							"line": 147,
+							"line": 145,
 							"character": 27
 						}
 					],
@@ -778,7 +781,7 @@
 			"sources": [
 				{
 					"fileName": "index.ts",
-					"line": 74,
+					"line": 73,
 					"character": 34
 				}
 			],

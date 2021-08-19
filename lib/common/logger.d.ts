@@ -7,4 +7,5 @@ export default class ComponentLogger {
     static error(m: any): void;
     static warning(m: any): void;
     static success(m: any): void;
+    static fatal(m: any): void;
 }

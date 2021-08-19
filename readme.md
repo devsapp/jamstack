@@ -12,7 +12,7 @@ Jamstack组件，主要负责Serverless-Devs项目的
 
 ## Jamstack组件的属性
 
-Jamstack组件的配置如下： 
+Jamstack组件的配置如下：
 
 ```yaml
  - name: portal #应用名称
@@ -23,7 +23,7 @@ Jamstack组件的配置如下：
    indexFile: index.html # index page文件名称
 ```
 
-其他配置： 
+其他配置：
 
 * httpRedirect: _redirects文件的HTTP重定向支持，true或者false
 
@@ -34,6 +34,16 @@ Jamstack组件的配置如下：
 ```
 s cli jamstack --help
 ```
+
+### 相关限制
+
+* 当个Jamstack应用的文件数不能超过10000
+* 文件不能超过10M
+* 不支持上传隐藏文件，也就是"."开头的文件，如 `.gitignore` 等
+* 浏览器端缓存规则，即自动添加 `Cache-Control: public, max-age=31536000` HTTP头，实现流量端缓存。
+    * 文件名等于或超过19个字节(含后缀名)
+    * 文件名匹配该正则表达式 `[\-._a-f\d][a-f\d]{8}.(js|css|woff|woff2|jpg|jpeg|png|svg)$`
+    * 文件在以下目录： '_nuxt/', '_snowpack/', '51cache/'
 
 ### 应用编排使用方式
 
