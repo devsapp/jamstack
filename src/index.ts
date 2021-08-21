@@ -3,12 +3,13 @@ import { spawn } from 'child_process';
 import yaml from 'js-yaml';
 import fs from 'fs';
 import _ from 'lodash';
+import hasha from 'hasha';
 import nodeFetch from 'node-fetch';
 import BaseComponent from './common/base';
 import logger from './common/logger';
 import { getJwtoken, getUploadUrl } from './common/jwt-token';
 import { ICredentials, InputProps } from './common/entity';
-import { createProject, verifyProject, updateProject } from './common/request';
+import { createProject, verifyProject, updateProject, listAppFiles } from './common/request';
 // import i18n from './common/i18n';
 
 const Host = 's.devsapp.cn';
@@ -163,38 +164,66 @@ export default class ComponentDemo extends BaseComponent {
     const uploadUrl = getUploadUrl(payload);
     try {
       const fileState = fs.statSync(filePath);
+      if (fileState.size == 0) {
+        // empty file
+        console.log(`${_shortName.padEnd(60)} ${formatBytes(fileState.size).padStart(10)} Skipped   Empty file`);
+        return;
+      }
       if (fileState.size <= MAX_FILE_SIZE) {
-        let headers = {
-          Host,
-          'Content-Type': contentType,
-          Authorization: `bear ${getJwtoken(payload)}`,
-        };
-        const cachedFile = isLegalCacheFile('/' + payload.fileName);
-        if (cachedFile) {
-          headers['Cache-Control'] = 'public, max-age=31536000';
+        // compare etag and skip file upload or not
+        let uploadSkip = false;
+        if (payload.remoteFiles && payload.remoteFiles[_shortName]) {
+          const remoteEtag = payload.remoteFiles[_shortName];
+          let localEtag;
+          if (payload.uploadFiles && payload.uploadFiles[_shortName]) {
+            localEtag = payload.uploadFiles[_shortName];
+          } else {
+            localEtag = await hasha.fromFile(filePath, { algorithm: 'md5' });
+          }
+          if (localEtag && remoteEtag === localEtag.toUpperCase()) {
+            uploadSkip = true;
+          }
         }
-        // hint, such as cached, optimize file size
-        let hint = cachedFile ? 'Cached ' : '';
-        if (fileState.size >= 2097152) {
-          // file size more than 2 MB
-          hint = hint + 'Optimize file size';
-        }
-        const stream = fs.createReadStream(filePath);
-        const res = await nodeFetch(uploadUrl, {
-          method: 'POST',
-          body: stream,
-          timeout: 25000,
-          headers: headers,
-        });
-        if (res.status === 200) {
-          console.log(`${_shortName.padEnd(60)} ${formatBytes(fileState.size).padStart(10)} Succeeded ${hint}`);
+        if (!uploadSkip) {
+          // 文件有修改，需要重新上传
+          let headers = {
+            Host,
+            'Content-Type': contentType,
+            Authorization: `bear ${getJwtoken(payload)}`,
+          };
+          const cachedFile = isLegalCacheFile('/' + payload.fileName);
+          if (cachedFile) {
+            headers['Cache-Control'] = 'public, max-age=31536000';
+          }
+          // hint, such as cached, optimize file size
+          let hint = cachedFile ? 'Cached ' : '';
+          if (fileState.size >= 2097152) {
+            // file size more than 2 MB
+            hint = hint + 'Optimize file size';
+          }
+          const stream = fs.createReadStream(filePath);
+          const res = await nodeFetch(uploadUrl, {
+            method: 'POST',
+            body: stream,
+            timeout: 25000,
+            headers: headers,
+          });
+          if (res.status === 200) {
+            console.log(`${_shortName.padEnd(60)} ${formatBytes(fileState.size).padStart(10)} Succeeded ${hint}`);
+          } else {
+            // 文件上传失败
+            logger.fatal(`${_shortName.padEnd(60)} ${formatBytes(fileState.size).padStart(10)} Failed`);
+          }
         } else {
-          logger.fatal(`${_shortName.padEnd(60)} ${formatBytes(fileState.size).padStart(10)} Failed`);
+          // 文件没有任何修改
+          console.log(`${_shortName.padEnd(60)} ${formatBytes(fileState.size).padStart(10)} Skipped   No local change`);
         }
       } else {
+        // 文件大于10M
         logger.fatal(`${_shortName.padEnd(60)} ${formatBytes(fileState.size).padStart(10)} Failed    Over 10M `);
       }
     } catch (e) {
+      // 文件上传过程的任何错误
       logger.fatal(`${_shortName.padEnd(71)} Failed    ${e.message}`);
     }
   }
@@ -293,23 +322,38 @@ export default class ComponentDemo extends BaseComponent {
               //生成 _files 文件，用于统计最后一次上传的文件列表
               const staticsFile = path.normalize(`${releaseCode}/_files`);
               const offset = releaseCode.length + 1;
-              let uploadFiles = files
-                .filter((fileName: string) => {
-                  return !path.posix.basename(fileName).startsWith('.');
-                })
-                .map((fileName: string) => {
-                  return fileName.substr(offset);
-                });
-              fs.writeFileSync(staticsFile, uploadFiles.join('\n'));
+              let uploadFiles = (
+                await Promise.all(
+                  files
+                    .filter((fileName: string) => {
+                      return !path.posix.basename(fileName).startsWith('.');
+                    })
+                    .map((fileName: string) => {
+                      return hasha.fromFile(fileName, { algorithm: 'md5' }).then((fileHash) => {
+                        return [fileName.substr(offset), fileHash];
+                      });
+                    }),
+                )
+              ).reduce(function (map, arr) {
+                map[arr[0]] = arr[1];
+                return map;
+              }, {});
+              fs.writeFileSync(staticsFile, JSON.stringify(uploadFiles));
               if (!files.includes(staticsFile)) {
                 files.push(staticsFile);
               }
+              // fetch remote files
+              const remoteObjects = await listAppFiles(domain, appName);
+              const remoteFiles = remoteObjects.objectMetadataList.reduce(function (map, obj) {
+                map[obj.key] = obj.etag;
+                return map;
+              }, {});
               // 上传文件
               const promiseArr = [];
               files.forEach((fileName: string) => {
                 promiseArr.push(
                   new Promise(async (resolve, reject) => {
-                    await this.uploadFile(fileName, { domain, appName }, releaseCode);
+                    await this.uploadFile(fileName, { domain, appName, remoteFiles, uploadFiles }, releaseCode);
                     resolve('');
                   }),
                 );
