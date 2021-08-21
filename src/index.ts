@@ -142,7 +142,7 @@ export default class ComponentDemo extends BaseComponent {
     return filesArr;
   }
 
-  private async uploadFiles(filePath, payload, sourceFolder?) {
+  private async uploadFile(filePath, payload, sourceFolder?) {
     let _shortName: string = payload.fileName;
     if (!payload.fileName) {
       if (process.platform === 'win32') {
@@ -276,7 +276,7 @@ export default class ComponentDemo extends BaseComponent {
               files.forEach((fileName) => {
                 promiseArr.push(
                   new Promise(async (resolve, reject) => {
-                    await this.uploadFiles(fileName, { domain, appName }, staicsFilesPath);
+                    await this.uploadFile(fileName, { domain, appName }, staicsFilesPath);
                     resolve('');
                   }),
                 );
@@ -309,7 +309,7 @@ export default class ComponentDemo extends BaseComponent {
               files.forEach((fileName: string) => {
                 promiseArr.push(
                   new Promise(async (resolve, reject) => {
-                    await this.uploadFiles(fileName, { domain, appName }, releaseCode);
+                    await this.uploadFile(fileName, { domain, appName }, releaseCode);
                     resolve('');
                   }),
                 );
