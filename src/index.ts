@@ -157,24 +157,33 @@ export default class ComponentDemo extends BaseComponent {
       logger.fatal(`${_shortName.padEnd(71)} Ignored`);
       return;
     }
+    let fileMetadata: { etag: string; size: number } = null;
+    if (payload.uploadFiles && payload.uploadFiles[_shortName]) {
+      fileMetadata = payload.uploadFiles[_shortName];
+    }
     const contentType = getFileContentType(filePath);
     const uploadUrl = getUploadUrl(payload);
     try {
-      const fileState = fs.statSync(filePath);
-      if (fileState.size == 0) {
+      let fileSize: number;
+      if (fileMetadata) {
+        fileSize = fileMetadata.size;
+      } else {
+        fileSize = fs.statSync(filePath).size;
+      }
+      if (fileSize == 0) {
         // empty file
-        logger.fatal(`${_shortName.padEnd(60)} ${formatBytes(fileState.size).padStart(10)} Skipped   Empty file`);
+        logger.fatal(`${_shortName.padEnd(60)} ${formatBytes(fileSize).padStart(10)} Skipped   Empty file`);
         return;
       }
-      if (fileState.size <= MAX_FILE_SIZE) {
+      if (fileSize <= MAX_FILE_SIZE) {
         // compare etag and skip file upload or not
         let uploadSkip = false;
         if (!(process.env.forceUpload === 'true')) {
           if (payload.remoteFiles && payload.remoteFiles[_shortName]) {
             const remoteEtag = payload.remoteFiles[_shortName];
             let localEtag;
-            if (payload.uploadFiles && payload.uploadFiles[_shortName]) {
-              localEtag = payload.uploadFiles[_shortName].etag;
+            if (fileMetadata) {
+              localEtag = fileMetadata.etag;
             } else {
               localEtag = await hasha.fromFile(filePath, { algorithm: 'md5' });
             }
@@ -196,7 +205,7 @@ export default class ComponentDemo extends BaseComponent {
           }
           // hint, such as cached, optimize file size
           let hint = cachedFile ? 'Cached ' : '';
-          if (fileState.size >= 2097152) {
+          if (fileSize >= 2097152) {
             // file size more than 2 MB
             hint = hint + 'Optimize file size';
           }
@@ -213,18 +222,18 @@ export default class ComponentDemo extends BaseComponent {
             });
           }
           if (res.status === 200) {
-            console.log(`${_shortName.padEnd(60)} ${formatBytes(fileState.size).padStart(10)} Succeeded ${hint}`);
+            console.log(`${_shortName.padEnd(60)} ${formatBytes(fileSize).padStart(10)} Succeeded ${hint}`);
           } else {
             // 文件上传失败
-            logger.fatal(`${_shortName.padEnd(60)} ${formatBytes(fileState.size).padStart(10)} Failed`);
+            logger.fatal(`${_shortName.padEnd(60)} ${formatBytes(fileSize).padStart(10)} Failed`);
           }
         } else {
           // 文件没有任何修改
-          console.log(`${_shortName.padEnd(60)} ${formatBytes(fileState.size).padStart(10)} Skipped   No local change`);
+          console.log(`${_shortName.padEnd(60)} ${formatBytes(fileSize).padStart(10)} Skipped   No local change`);
         }
       } else {
         // 文件大于10M
-        logger.fatal(`${_shortName.padEnd(60)} ${formatBytes(fileState.size).padStart(10)} Failed    Over 10M `);
+        logger.fatal(`${_shortName.padEnd(60)} ${formatBytes(fileSize).padStart(10)} Failed    Over 10M `);
       }
     } catch (e) {
       // 文件上传过程的任何错误
