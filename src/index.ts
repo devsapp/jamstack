@@ -172,7 +172,7 @@ export default class ComponentDemo extends BaseComponent {
       }
       if (fileSize == 0) {
         // empty file
-        logger.fatal(`${_shortName.padEnd(60)} ${formatBytes(fileSize).padStart(10)} Skipped   Empty file`);
+        logger.fatal(`${_shortName.padEnd(60)} ${formatBytes(fileSize).padStart(10)} Ignored   Empty file`);
         return;
       }
       if (fileSize <= MAX_FILE_SIZE) {
