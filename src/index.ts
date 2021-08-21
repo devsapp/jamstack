@@ -171,7 +171,7 @@ export default class ComponentDemo extends BaseComponent {
       const fileState = fs.statSync(filePath);
       if (fileState.size == 0) {
         // empty file
-        console.log(`${_shortName.padEnd(60)} ${formatBytes(fileState.size).padStart(10)} Skipped   Empty file`);
+        logger.fatal(`${_shortName.padEnd(60)} ${formatBytes(fileState.size).padStart(10)} Skipped   Empty file`);
         return;
       }
       if (fileState.size <= MAX_FILE_SIZE) {
@@ -354,11 +354,17 @@ export default class ComponentDemo extends BaseComponent {
               ).reduce(function (map, arr) {
                 const fileSize = arr[2] as number;
                 if (fileSize > 0 && fileSize <= MAX_FILE_SIZE) {
-                  map[arr[0]] = { etag: arr[1], size: arr[2] };
+                  map[arr[0]] = { etag: arr[1], size: arr[2], key: arr[0] };
                 }
                 return map;
               }, {});
-              fs.writeFileSync(staticsFile, JSON.stringify(uploadFiles));
+              const totalFilesSize = Object.values(uploadFiles).reduce(function (total: number, obj: any) {
+                return total + obj.size;
+              }, 0);
+              fs.writeFileSync(
+                staticsFile,
+                JSON.stringify({ domain: domain, app: appName, totalFilesSize: totalFilesSize, objectMetadataList: Object.values(uploadFiles) }),
+              );
               if (!files.includes(staticsFile)) {
                 files.push(staticsFile);
               }
