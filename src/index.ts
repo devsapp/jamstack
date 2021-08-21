@@ -154,7 +154,7 @@ export default class ComponentDemo extends BaseComponent {
     }
     // ignore the hidden file that start with '.'
     if (path.posix.basename(filePath).startsWith('.')) {
-      logger.fatal(`${_shortName.padEnd(71)} Ignored`);
+      logger.fatal(`${_shortName.padEnd(71)} Ignored   Hidden file`);
       return;
     }
     let fileMetadata: { etag: string; size: number } = null;
