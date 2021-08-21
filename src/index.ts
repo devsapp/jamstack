@@ -233,7 +233,7 @@ export default class ComponentDemo extends BaseComponent {
         }
       } else {
         // 文件大于10M
-        logger.fatal(`${_shortName.padEnd(60)} ${formatBytes(fileSize).padStart(10)} Failed    Over 10M `);
+        logger.fatal(`${_shortName.padEnd(60)} ${formatBytes(fileSize).padStart(10)} Ignored   Over 10M `);
       }
     } catch (e) {
       // 文件上传过程的任何错误
