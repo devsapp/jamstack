@@ -14,24 +14,21 @@ import { createProject, verifyProject, updateProject, listAppFiles } from './com
 // import i18n from './common/i18n';
 
 const Host = 's.devsapp.cn';
-const CONTENT_TYPE_MAP = {
-  html: 'text/html; charset=UTF-8',
-  htm: 'text/html; charset=UTF-8',
-  text: 'text/plain; charset=UTF-8',
-  txt: 'text/plain; charset=UTF-8',
-  xml: 'text/xml; charset=UTF-8',
-  rss: 'application/rss+xml; charset=UTF-8',
-  atom: 'application/atom+xml; charset=UTF-8',
-  svg: 'image/svg+xml; charset=UTF-8',
-  xhtml: 'application/xhtml+xml; charset=UTF-8',
-  json: 'application/json; charset=UTF-8',
-  yaml: 'application/x-yaml; charset=UTF-8',
-  map: 'application/json; charset=UTF-8',
-  pdf: 'application/pdf; charset=UTF-8',
-  js: 'application/javascript; charset=UTF-8',
-  css: 'text/css; charset=UTF-8',
-  md: 'text/markdown; charset=UTF-8',
-};
+
+// reset some mime types
+mime.define({ 'text/html; charset=UTF-8': ['html', 'htm'] }, true);
+mime.define({ 'application/xhtml+xml; charset=UTF-8': ['xhtml', 'htm'] }, true);
+mime.define({ 'text/plain; charset=UTF-8': ['text', 'txt'] }, true);
+mime.define({ 'text/xml; charset=UTF-8': ['xml'] }, true);
+mime.define({ 'application/rss+xml; charset=UTF-8': ['rss'] }, true);
+mime.define({ 'application/atom+xml; charset=UTF-8': ['atom'] }, true);
+mime.define({ 'image/svg+xml; charset=UTF-8': ['svg'] }, true);
+mime.define({ 'application/json; charset=UTF-8': ['json'] }, true);
+mime.define({ 'application/x-yaml; charset=UTF-8': ['yaml'] }, true);
+mime.define({ 'application/javascript; charset=UTF-8': ['js'] }, true);
+mime.define({ 'text/css; charset=UTF-8': ['css'] }, true);
+mime.define({ 'text/markdown; charset=UTF-8': ['md'] }, true);
+
 const MAX_FILE_SIZE = 10485760;
 const CACHE_RULE_REGEXP = new RegExp('[\\-._a-f\\d][a-f\\d]{8}.(js|css|woff|woff2|jpg|jpeg|png|svg)$');
 const CACHED_PATHS = ['/_nuxt/', '/_snowpack/', '/51cache/'];
@@ -65,11 +62,7 @@ function getFileObjectKey(filePath: string, sourceFolder: string): string {
 }
 
 function getFileContentType(filePath: string) {
-  let extName = path.extname(filePath);
-  if (extName.startsWith('.')) {
-    extName = extName.substr(1);
-  }
-  return CONTENT_TYPE_MAP[extName] || mime.type(extName) || 'text/plain; charset=UTF-8';
+  return mime.getType(filePath) || 'application/octet-stream';
 }
 
 function formatBytes(bytes: number, decimals = 2): string {
