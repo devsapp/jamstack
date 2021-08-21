@@ -32,6 +32,11 @@ export const verifyProject = async (domain: string): Promise<OperationResult> =>
     method: 'POST',
   });
 
+export const listAppFiles = async (domain: string, appName: string) =>
+  getJwtToken(`/objects/${domain}/${appName}`, {
+    method: 'GET',
+  });
+
 export const updateProject = async (payload: IUpdateProjectPayload): Promise<OperationResult> =>
   getJwtToken(`/project/update/${payload.domain}`, {
     method: 'POST',
