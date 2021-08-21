@@ -225,7 +225,7 @@ export default class ComponentDemo extends BaseComponent {
             console.log(`${_shortName.padEnd(60)} ${formatBytes(fileSize).padStart(10)} Succeeded ${hint}`);
           } else {
             // 文件上传失败
-            logger.fatal(`${_shortName.padEnd(60)} ${formatBytes(fileSize).padStart(10)} Failed`);
+            logger.fatal(`${_shortName.padEnd(60)} ${formatBytes(fileSize).padStart(10)} Failed    Upload Failure`);
           }
         } else {
           // 文件没有任何修改
