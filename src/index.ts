@@ -3,6 +3,7 @@ import { spawn } from 'child_process';
 import yaml from 'js-yaml';
 import fs from 'fs';
 import _ from 'lodash';
+import mime from 'mime';
 import hasha from 'hasha';
 import nodeFetch from 'node-fetch';
 import BaseComponent from './common/base';
@@ -21,11 +22,6 @@ const CONTENT_TYPE_MAP = {
   xml: 'text/xml; charset=UTF-8',
   rss: 'application/rss+xml; charset=UTF-8',
   atom: 'application/atom+xml; charset=UTF-8',
-  gif: 'image/gif',
-  jpg: 'image/jpeg',
-  jpeg: 'image/jpeg',
-  ico: 'image/x-icon',
-  png: 'image/png',
   svg: 'image/svg+xml; charset=UTF-8',
   xhtml: 'application/xhtml+xml; charset=UTF-8',
   json: 'application/json; charset=UTF-8',
@@ -35,11 +31,6 @@ const CONTENT_TYPE_MAP = {
   js: 'application/javascript; charset=UTF-8',
   css: 'text/css; charset=UTF-8',
   md: 'text/markdown; charset=UTF-8',
-  wasm: 'application/wasm',
-  zip: 'application/x-zip',
-  mp3: 'audio/mpeg',
-  ogg: 'video/ogg',
-  mp4: 'video/mp4',
 };
 const MAX_FILE_SIZE = 10485760;
 const CACHE_RULE_REGEXP = new RegExp('[\\-._a-f\\d][a-f\\d]{8}.(js|css|woff|woff2|jpg|jpeg|png|svg)$');
@@ -71,6 +62,14 @@ function getFileObjectKey(filePath: string, sourceFolder: string): string {
     fileObjectKey = filePath.replace(sourceFolder + '/', '');
   }
   return fileObjectKey;
+}
+
+function getFileContentType(filePath: string) {
+  let extName = path.extname(filePath);
+  if (extName.startsWith('.')) {
+    extName = extName.substr(1);
+  }
+  return CONTENT_TYPE_MAP[extName] || mime.type(extName) || 'text/plain; charset=UTF-8';
 }
 
 function formatBytes(bytes: number, decimals = 2): string {
@@ -165,7 +164,7 @@ export default class ComponentDemo extends BaseComponent {
       logger.fatal(`${_shortName.padEnd(71)} Ignored`);
       return;
     }
-    const contentType = CONTENT_TYPE_MAP[path.extname(filePath).substr(1)] || 'text/plain; charset=UTF-8';
+    const contentType = getFileContentType(filePath);
     const uploadUrl = getUploadUrl(payload);
     try {
       const fileState = fs.statSync(filePath);
@@ -448,7 +447,7 @@ export default class ComponentDemo extends BaseComponent {
         }
       }
       const result_domain = `https://${domain}`;
-      const successInfo = [`部署成功! 访问域名: ${result_domain}`, '部署信息：', yaml.dump(inputs.props)].join('\n');
+      const successInfo = [`Succeed to deploy, and website url: ${result_domain}`, ' Deployment info：', yaml.dump(inputs.props)].join('\n');
       super.__report({
         name: 'domain',
         content: {
