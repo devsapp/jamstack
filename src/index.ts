@@ -290,9 +290,23 @@ export default class ComponentDemo extends BaseComponent {
             logger.info(`Begin to upload the files for app: ${appName}`);
             const files = this.travelAsync(releaseCode);
             if (files.length <= 10000) {
-              //文件数超过10000
+              //生成 _files 文件，用于统计最后一次上传的文件列表
+              const staticsFile = path.normalize(`${releaseCode}/_files`);
+              const offset = releaseCode.length + 1;
+              let uploadFiles = files
+                .filter((fileName: string) => {
+                  return !path.posix.basename(fileName).startsWith('.');
+                })
+                .map((fileName: string) => {
+                  return fileName.substr(offset);
+                });
+              fs.writeFileSync(staticsFile, uploadFiles.join('\n'));
+              if (!files.includes(staticsFile)) {
+                files.push(staticsFile);
+              }
+              // 上传文件
               const promiseArr = [];
-              files.forEach((fileName) => {
+              files.forEach((fileName: string) => {
                 promiseArr.push(
                   new Promise(async (resolve, reject) => {
                     await this.uploadFiles(fileName, { domain, appName }, releaseCode);
