@@ -62,6 +62,17 @@ function isLegalCacheFile(absoluteFilePath: string): boolean {
   return false;
 }
 
+function getFileObjectKey(filePath: string, sourceFolder: string): string {
+  let fileObjectKey: string;
+  if (process.platform === 'win32') {
+    let tmpFilePath = filePath.replace(/\\/g, '/');
+    fileObjectKey = tmpFilePath.replace(sourceFolder + '/', '');
+  } else {
+    fileObjectKey = filePath.replace(sourceFolder + '/', '');
+  }
+  return fileObjectKey;
+}
+
 function formatBytes(bytes: number, decimals = 2): string {
   if (bytes === 0) return '0 Bytes';
   const k = 1024;
@@ -146,13 +157,7 @@ export default class ComponentDemo extends BaseComponent {
   private async uploadFile(filePath, payload, sourceFolder?) {
     let _shortName: string = payload.fileName;
     if (!payload.fileName) {
-      if (process.platform === 'win32') {
-        let tmpFilePath = filePath.replace(/\\/g, '/');
-        _shortName = tmpFilePath.replace(sourceFolder + '/', '');
-      } else {
-        _shortName = filePath.replace(sourceFolder + '/', '');
-      }
-
+      _shortName = getFileObjectKey(filePath, sourceFolder);
       payload.fileName = _shortName;
     }
     // ignore the hidden file that start with '.'
@@ -172,16 +177,18 @@ export default class ComponentDemo extends BaseComponent {
       if (fileState.size <= MAX_FILE_SIZE) {
         // compare etag and skip file upload or not
         let uploadSkip = false;
-        if (payload.remoteFiles && payload.remoteFiles[_shortName]) {
-          const remoteEtag = payload.remoteFiles[_shortName];
-          let localEtag;
-          if (payload.uploadFiles && payload.uploadFiles[_shortName]) {
-            localEtag = payload.uploadFiles[_shortName];
-          } else {
-            localEtag = await hasha.fromFile(filePath, { algorithm: 'md5' });
-          }
-          if (localEtag && remoteEtag === localEtag.toUpperCase()) {
-            uploadSkip = true;
+        if (!(process.env.forceUpload === 'true')) {
+          if (payload.remoteFiles && payload.remoteFiles[_shortName]) {
+            const remoteEtag = payload.remoteFiles[_shortName];
+            let localEtag;
+            if (payload.uploadFiles && payload.uploadFiles[_shortName]) {
+              localEtag = payload.uploadFiles[_shortName].etag;
+            } else {
+              localEtag = await hasha.fromFile(filePath, { algorithm: 'md5' });
+            }
+            if (localEtag && remoteEtag === localEtag.toUpperCase()) {
+              uploadSkip = true;
+            }
           }
         }
         if (!uploadSkip) {
@@ -201,13 +208,18 @@ export default class ComponentDemo extends BaseComponent {
             // file size more than 2 MB
             hint = hint + 'Optimize file size';
           }
-          const stream = fs.createReadStream(filePath);
-          const res = await nodeFetch(uploadUrl, {
-            method: 'POST',
-            body: stream,
-            timeout: 25000,
-            headers: headers,
-          });
+          let res;
+          if (process.env.dryRun === 'true') {
+            res = { status: 200 };
+          } else {
+            const stream = fs.createReadStream(filePath);
+            res = await nodeFetch(uploadUrl, {
+              method: 'POST',
+              body: stream,
+              timeout: 25000,
+              headers: headers,
+            });
+          }
           if (res.status === 200) {
             console.log(`${_shortName.padEnd(60)} ${formatBytes(fileState.size).padStart(10)} Succeeded ${hint}`);
           } else {
@@ -254,7 +266,12 @@ export default class ComponentDemo extends BaseComponent {
       domain,
     });
     // update project metadata
-    const updateResult = await updateProject(updatePayload);
+    let updateResult;
+    if (process.env.dryRun === 'true') {
+      updateResult = { success: true };
+    } else {
+      updateResult = await updateProject(updatePayload);
+    }
     if (updateResult.success) {
       logger.info(`Succeed to update project metadata`);
       //todo delete the stale files
@@ -321,21 +338,24 @@ export default class ComponentDemo extends BaseComponent {
             if (files.length <= 10000) {
               //生成 _files 文件，用于统计最后一次上传的文件列表
               const staticsFile = path.normalize(`${releaseCode}/_files`);
-              const offset = releaseCode.length + 1;
               let uploadFiles = (
                 await Promise.all(
                   files
-                    .filter((fileName: string) => {
-                      return !path.posix.basename(fileName).startsWith('.');
+                    .filter((filePath: string) => {
+                      return !path.posix.basename(filePath).startsWith('.');
                     })
-                    .map((fileName: string) => {
-                      return hasha.fromFile(fileName, { algorithm: 'md5' }).then((fileHash) => {
-                        return [fileName.substr(offset), fileHash];
+                    .map((filePath: string) => {
+                      const fileState = fs.statSync(filePath);
+                      return hasha.fromFile(filePath, { algorithm: 'md5' }).then((fileHash) => {
+                        return [getFileObjectKey(filePath, releaseCode), fileHash, fileState.size];
                       });
                     }),
                 )
               ).reduce(function (map, arr) {
-                map[arr[0]] = arr[1];
+                const fileSize = arr[2] as number;
+                if (fileSize > 0 && fileSize <= MAX_FILE_SIZE) {
+                  map[arr[0]] = { etag: arr[1], size: arr[2] };
+                }
                 return map;
               }, {});
               fs.writeFileSync(staticsFile, JSON.stringify(uploadFiles));
@@ -378,6 +398,7 @@ export default class ComponentDemo extends BaseComponent {
 
   public async deploy(inputs: InputProps) {
     process.env.dryRun = (inputs.args.indexOf('--dry-run') >= 0).toString();
+    process.env.forceUpload = (inputs.args.indexOf('--force-upload') >= 0).toString();
     const { domain, apps, defaultApp, favicon } = inputs.props;
     try {
       const credentials = inputs.credentials;
@@ -429,7 +450,9 @@ export default class ComponentDemo extends BaseComponent {
           weight: 3,
         },
       });
-
+      if (process.env.dryRun === 'true') {
+        logger.fatal('Running on dry run mode, no any change to upload!');
+      }
       return successInfo;
     } catch (e) {
       throw new Error(e.message);
