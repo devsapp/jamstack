@@ -35,6 +35,11 @@ Jamstack组件的配置如下：
 s cli jamstack --help
 ```
 
+jamstack组件的`deploy`子命令的参数如下：
+
+* --dry-run: 模拟更新操作，不会有任何文件上传到服务器
+* --force-upload: 从本地从新重新上传所有文件，如果上传中出现中断，建议下一次上传添加该选项
+
 ### 相关限制
 
 * 当个Jamstack应用的文件数不能超过10000
