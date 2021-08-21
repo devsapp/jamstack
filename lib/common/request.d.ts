@@ -22,6 +22,7 @@ export declare const createProject: (domain: string) => Promise<OperationResult>
  * @param domain
  */
 export declare const verifyProject: (domain: string) => Promise<OperationResult>;
+export declare const listAppFiles: (domain: string, appName: string) => Promise<any>;
 export declare const updateProject: (payload: IUpdateProjectPayload) => Promise<OperationResult>;
 /**
  * 用户的project列表

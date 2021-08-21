@@ -672,7 +672,7 @@
 				},
 				{
 					"id": 17,
-					"name": "uploadFiles",
+					"name": "uploadFile",
 					"kind": 2048,
 					"kindString": "Method",
 					"flags": {
@@ -682,13 +682,13 @@
 						{
 							"fileName": "index.ts",
 							"line": 145,
-							"character": 27
+							"character": 26
 						}
 					],
 					"signatures": [
 						{
 							"id": 18,
-							"name": "uploadFiles",
+							"name": "uploadFile",
 							"kind": 4096,
 							"kindString": "Call signature",
 							"flags": {},

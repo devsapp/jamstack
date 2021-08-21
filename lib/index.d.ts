@@ -6,7 +6,7 @@ export default class ComponentDemo extends BaseComponent {
     private setEnv;
     private travel;
     private travelAsync;
-    private uploadFiles;
+    private uploadFile;
     /**
      * update project metadata and upload the files
      */
