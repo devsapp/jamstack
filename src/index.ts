@@ -187,7 +187,7 @@ export default class ComponentDemo extends BaseComponent {
             } else {
               localEtag = await hasha.fromFile(filePath, { algorithm: 'md5' });
             }
-            if (localEtag && remoteEtag === localEtag.toUpperCase()) {
+            if (localEtag && (remoteEtag === localEtag || remoteEtag === localEtag.toUpperCase())) {
               uploadSkip = true;
             }
           }
