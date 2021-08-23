@@ -46,7 +46,7 @@ jamstack组件的`deploy`子命令的参数如下：
 * 单个文件不能超过10M
 * 空文件：也就是文件大小为0，不会上传
 * 隐藏文件：也就是"."开头的文件，如 `.gitignore` 等，不会上传到服务端
-* 浏览器端缓存规则，即自动添加 `Cache-Control: public, max-age=31536000` HTTP头，实现流量端缓存。
+* 浏览器端缓存规则，即自动添加 `Cache-Control: public, max-age=31536000` HTTP头，实现浏览器端的缓存，提升站点的访问体验。
     * 文件名等于或超过19个字节(含后缀名)
     * 文件名匹配该正则表达式 `[\-._a-f\d][a-f\d]{8}.(js|css|woff|woff2|jpg|jpeg|png|svg)$`
     * 文件在以下目录： '_nuxt/', '_snowpack/', '51cache/'
