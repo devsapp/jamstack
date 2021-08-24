@@ -11,7 +11,6 @@ export default class ComponentDemo extends BaseComponent {
      * update project metadata and upload the files
      */
     private updateProjectInfo;
-    private exeBuildWebStaticCmd;
     private checkAndUploadFiles;
     deploy(inputs: InputProps): Promise<string>;
 }

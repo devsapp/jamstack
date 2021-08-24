@@ -56,7 +56,7 @@
 					}
 				},
 				{
-					"id": 35,
+					"id": 31,
 					"name": "client",
 					"kind": 1024,
 					"kindString": "Property",
@@ -104,7 +104,7 @@
 					"defaultValue": "[]"
 				},
 				{
-					"id": 36,
+					"id": 32,
 					"name": "inputs",
 					"kind": 1024,
 					"kindString": "Property",
@@ -121,7 +121,7 @@
 					}
 				},
 				{
-					"id": 39,
+					"id": 35,
 					"name": "__doc",
 					"kind": 2048,
 					"kindString": "Method",
@@ -135,14 +135,14 @@
 					],
 					"signatures": [
 						{
-							"id": 40,
+							"id": 36,
 							"name": "__doc",
 							"kind": 4096,
 							"kindString": "Call signature",
 							"flags": {},
 							"parameters": [
 								{
-									"id": 41,
+									"id": 37,
 									"name": "projectName",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -171,7 +171,7 @@
 					}
 				},
 				{
-					"id": 37,
+					"id": 33,
 					"name": "__getBasePath",
 					"kind": 2048,
 					"kindString": "Method",
@@ -185,7 +185,7 @@
 					],
 					"signatures": [
 						{
-							"id": 38,
+							"id": 34,
 							"name": "__getBasePath",
 							"kind": 4096,
 							"kindString": "Call signature",
@@ -206,7 +206,7 @@
 					}
 				},
 				{
-					"id": 42,
+					"id": 38,
 					"name": "__report",
 					"kind": 2048,
 					"kindString": "Method",
@@ -222,14 +222,14 @@
 					],
 					"signatures": [
 						{
-							"id": 43,
+							"id": 39,
 							"name": "__report",
 							"kind": 4096,
 							"kindString": "Call signature",
 							"flags": {},
 							"parameters": [
 								{
-									"id": 44,
+									"id": 40,
 									"name": "reportData",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -301,7 +301,7 @@
 					}
 				},
 				{
-					"id": 29,
+					"id": 25,
 					"name": "checkAndUploadFiles",
 					"kind": 2048,
 					"kindString": "Method",
@@ -311,20 +311,20 @@
 					"sources": [
 						{
 							"fileName": "index.ts",
-							"line": 302,
+							"line": 284,
 							"character": 35
 						}
 					],
 					"signatures": [
 						{
-							"id": 30,
+							"id": 26,
 							"name": "checkAndUploadFiles",
 							"kind": 4096,
 							"kindString": "Call signature",
 							"flags": {},
 							"parameters": [
 								{
-									"id": 31,
+									"id": 27,
 									"name": "__namedParameters",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -352,7 +352,7 @@
 					]
 				},
 				{
-					"id": 32,
+					"id": 28,
 					"name": "deploy",
 					"kind": 2048,
 					"kindString": "Method",
@@ -362,20 +362,20 @@
 					"sources": [
 						{
 							"fileName": "index.ts",
-							"line": 412,
+							"line": 379,
 							"character": 21
 						}
 					],
 					"signatures": [
 						{
-							"id": 33,
+							"id": 29,
 							"name": "deploy",
 							"kind": 4096,
 							"kindString": "Call signature",
 							"flags": {},
 							"parameters": [
 								{
-									"id": 34,
+									"id": 30,
 									"name": "inputs",
 									"kind": 32768,
 									"kindString": "Parameter",
@@ -392,65 +392,6 @@
 									{
 										"type": "intrinsic",
 										"name": "string"
-									}
-								],
-								"name": "Promise"
-							}
-						}
-					]
-				},
-				{
-					"id": 25,
-					"name": "exeBuildWebStaticCmd",
-					"kind": 2048,
-					"kindString": "Method",
-					"flags": {
-						"isPrivate": true
-					},
-					"sources": [
-						{
-							"fileName": "index.ts",
-							"line": 284,
-							"character": 36
-						}
-					],
-					"signatures": [
-						{
-							"id": 26,
-							"name": "exeBuildWebStaticCmd",
-							"kind": 4096,
-							"kindString": "Call signature",
-							"flags": {},
-							"parameters": [
-								{
-									"id": 27,
-									"name": "_path",
-									"kind": 32768,
-									"kindString": "Parameter",
-									"flags": {},
-									"type": {
-										"type": "intrinsic",
-										"name": "string"
-									}
-								},
-								{
-									"id": 28,
-									"name": "appName",
-									"kind": 32768,
-									"kindString": "Parameter",
-									"flags": {},
-									"type": {
-										"type": "intrinsic",
-										"name": "string"
-									}
-								}
-							],
-							"type": {
-								"type": "reference",
-								"typeArguments": [
-									{
-										"type": "intrinsic",
-										"name": "any"
 									}
 								],
 								"name": "Promise"
@@ -755,21 +696,20 @@
 					"title": "Properties",
 					"kind": 1024,
 					"children": [
-						35,
+						31,
 						5,
-						36
+						32
 					]
 				},
 				{
 					"title": "Methods",
 					"kind": 2048,
 					"children": [
-						39,
-						37,
-						42,
-						29,
-						32,
+						35,
+						33,
+						38,
 						25,
+						28,
 						6,
 						9,
 						13,
