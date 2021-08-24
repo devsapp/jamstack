@@ -23,8 +23,9 @@ Jamstack组件的配置如下：
    indexFile: index.html # index page文件名称
 ```
 
-其他配置：
+其他配置项：
 
+* buildCmd: 构建应用的命令，如 `npm run build`
 * httpRedirect: _redirects文件的HTTP重定向支持，true或者false
 
 ## 具体用法
