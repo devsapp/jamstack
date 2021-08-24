@@ -25,7 +25,7 @@ Properties:
   defaultApp:
     Description: 默认应用（从apps里面选择）
     Required: true
-    Type: 
+    Type:
       - String
   apps:
     Description: 应用
@@ -42,8 +42,8 @@ Properties:
             Type:
               - String
             Required: true
-          sourceCode:
-            Description: '源码地址'
+          buildCmd:
+            Description: '应用编译命令'
             Type:
               - String
             Required: false
