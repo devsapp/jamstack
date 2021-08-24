@@ -25,7 +25,8 @@ export function getDefaultProfilePath(): string {
   return path.join(os.homedir(), '.s', 'set-config.yml');
 }
 
-const i18n = new I18n({
+const i18n = new I18n();
+i18n.configure({
   locales: ['en', 'zh'],
   directory: path.join(__dirname, '..', '..', 'locales'),
 });
