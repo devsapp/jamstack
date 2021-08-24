@@ -192,6 +192,13 @@ export default class ComponentDemo extends BaseComponent {
             }
           }
         }
+        const cachedFile = isLegalCacheFile('/' + payload.fileName);
+        // hint, such as cached, optimize file size
+        let hint = cachedFile ? 'Cached ' : '';
+        if (fileSize >= 2097152) {
+          // file size more than 2 MB
+          hint = hint + 'Optimize file size';
+        }
         if (!uploadSkip) {
           // 文件有修改，需要重新上传
           let headers = {
@@ -199,15 +206,8 @@ export default class ComponentDemo extends BaseComponent {
             'Content-Type': contentType,
             Authorization: `bear ${getJwtoken(payload)}`,
           };
-          const cachedFile = isLegalCacheFile('/' + payload.fileName);
           if (cachedFile) {
             headers['Cache-Control'] = 'public, max-age=31536000';
-          }
-          // hint, such as cached, optimize file size
-          let hint = cachedFile ? 'Cached ' : '';
-          if (fileSize >= 2097152) {
-            // file size more than 2 MB
-            hint = hint + 'Optimize file size';
           }
           let res;
           if (process.env.dryRun === 'true') {
@@ -229,7 +229,7 @@ export default class ComponentDemo extends BaseComponent {
           }
         } else {
           // 文件没有任何修改
-          console.log(`${_shortName.padEnd(60)} ${formatBytes(fileSize).padStart(10)} Skipped   No local change`);
+          console.log(`${_shortName.padEnd(60)} ${formatBytes(fileSize).padStart(10)} Skipped   No local change ${hint}`);
         }
       } else {
         // 文件大于10M
