@@ -61,11 +61,11 @@
 				<a href="#组件说明" id="组件说明" style="color: inherit; text-decoration: none;">
 					<h2>组件说明</h2>
 				</a>
-				<p>Jamstack组件，主要负责Serverless-Devs项目的</p>
+				<p>Jamstack组件，主要负责Serverless-Devs项目相关的功能，核心功能如下：</p>
 				<ul>
-					<li>域名的自动申请</li>
-					<li>项目的元信息更新</li>
-					<li>Jamstack站点的文件上传</li>
+					<li>项目域名的自动申请： 包括平台域名和自定义域名的支持</li>
+					<li>项目的元信息更新： 包含项目的域名，项目中各个应用的元信息</li>
+					<li>Jamstack站点的文件同步： 支持站点文件的增量上传，支持Jamstack部分文件的浏览器端缓存</li>
 				</ul>
 				<a href="#使用场景" id="使用场景" style="color: inherit; text-decoration: none;">
 					<h2>使用场景</h2>
@@ -104,11 +104,10 @@
 				</a>
 				<ul>
 					<li>当个Jamstack应用的文件数不能超过10000</li>
-					<li>文件不能超过10M</li>
-					<li>空文件，也就是文件大小为0，不会上传</li>
-					<li>如果文件没有任何修改，则不会上传进行覆盖</li>
-					<li>不支持上传隐藏文件，也就是&quot;.&quot;开头的文件，如 <code>.gitignore</code> 等</li>
-					<li>浏览器端缓存规则，即自动添加 <code>Cache-Control: public, max-age=31536000</code> HTTP头，实现流量端缓存。<ul>
+					<li>单个文件不能超过10M</li>
+					<li>空文件：也就是文件大小为0，不会上传</li>
+					<li>隐藏文件：也就是&quot;.&quot;开头的文件，如 <code>.gitignore</code> 等，不会上传到服务端</li>
+					<li>浏览器端缓存规则，即自动添加 <code>Cache-Control: public, max-age=31536000</code> HTTP头，实现浏览器端的缓存，提升站点的访问体验。<ul>
 							<li>文件名等于或超过19个字节(含后缀名)</li>
 							<li>文件名匹配该正则表达式 <code>[\-._a-f\d][a-f\d]{8}.(js|css|woff|woff2|jpg|jpeg|png|svg)$</code></li>
 							<li>文件在以下目录： &#39;_nuxt/&#39;, &#39;_snowpack/&#39;, &#39;51cache/&#39;</li>
