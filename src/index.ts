@@ -1,7 +1,7 @@
 import path from 'path';
-import { spawn } from 'child_process';
 import yaml from 'js-yaml';
 import fs from 'fs';
+import { execSync } from 'child_process';
 import _ from 'lodash';
 import mime from 'mime';
 import hasha from 'hasha';
@@ -247,7 +247,7 @@ export default class ComponentDemo extends BaseComponent {
   private async updateProjectInfo({ apps, project, domain, favicon, defaultApp }) {
     const copyApps = _.cloneDeepWith(apps);
     apps.forEach((app) => {
-      app.sourceCode && delete app.sourceCode;
+      app.buildCmd && delete app.buildCmd;
       app.releaseCode && delete app.releaseCode;
     });
     const updatePayload = {
@@ -281,58 +281,25 @@ export default class ComponentDemo extends BaseComponent {
     }
   }
 
-  private async exeBuildWebStaticCmd(_path: string, appName: string): Promise<any> {
-    return new Promise((resolve, reject) => {
-      if (fs.existsSync(path.join(_path, 'package.json'))) {
-        const buildCmd = spawn('npm', ['run', 'build'], {
-          shell: true,
-          cwd: _path,
-          stdio: 'inherit',
-        });
-        buildCmd.on('close', (code) => {
-          logger.success(`【${appName}】 execute build successfully`);
-          resolve({ code });
-        });
-      } else {
-        resolve({});
-      }
-    });
-  }
-
   private async checkAndUploadFiles({ apps, domain }) {
     const allAppFunction = [];
     apps.forEach((item, i) => {
       const promiseFunction = new Promise(async (resolve, reject) => {
         try {
           const appName = item.name;
-          const sourceCode = item.sourceCode; // 源码文件，需要构建
+          const buildCmd = item.buildCmd; // 应用构建命令
           const releaseCode = item.releaseCode; // 构建好的静态文件
-          if (fs.existsSync(sourceCode)) {
-            await this.exeBuildWebStaticCmd(sourceCode, appName);
-            let statisFilesName = ['build', 'dist', 'release'];
-            let staicsFilesPath = '';
-            statisFilesName.forEach((fileName) => {
-              const staticReleasePath = path.join(sourceCode, fileName);
-              if (fs.existsSync(staticReleasePath)) {
-                staicsFilesPath = staticReleasePath;
-              }
-            });
-            if (fs.existsSync(staicsFilesPath)) {
-              const files = this.travelAsync(staicsFilesPath);
-              const promiseArr = [];
-              files.forEach((fileName) => {
-                promiseArr.push(
-                  new Promise(async (resolve, reject) => {
-                    await this.uploadFile(fileName, { domain, appName }, staicsFilesPath);
-                    resolve('');
-                  }),
-                );
-              });
-              await Promise.all(promiseArr);
-              logger.info(`-----【${appName}】 upload completed ----- \n\n`);
-              resolve(i);
+          if (buildCmd) {
+            // 执行应用的构建
+            logger.info(`Begin to build the app: ${appName}`);
+            try {
+              execSync(buildCmd, { stdio: 'inherit' });
+            } catch (e) {
+              logger.fatal(e.message);
+              process.exit(1);
             }
-          } else if (fs.existsSync(releaseCode)) {
+          }
+          if (fs.existsSync(releaseCode)) {
             // 如果有直接指定静态文件直接进行上传
             logger.info(`Begin to upload the files for app: ${appName}`);
             const files = this.travelAsync(releaseCode);
