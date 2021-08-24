@@ -364,7 +364,13 @@ export default class ComponentDemo extends BaseComponent {
               }, 0);
               fs.writeFileSync(
                 staticsFile,
-                JSON.stringify({ domain: domain, app: appName, totalFilesSize: totalFilesSize, objectMetadataList: Object.values(uploadFiles) }),
+                JSON.stringify({
+                  domain: domain,
+                  app: appName,
+                  totalFilesSize: totalFilesSize,
+                  timestamp: Date.now(),
+                  objectMetadataList: Object.values(uploadFiles),
+                }),
               );
               if (!files.includes(staticsFile)) {
                 files.push(staticsFile);
