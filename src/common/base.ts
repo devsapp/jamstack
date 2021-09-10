@@ -1,12 +1,13 @@
 import fs from 'fs';
 import path from 'path';
 import Table from 'tty-table';
-import get from 'lodash.get';
+import _ from 'lodash';
 
 export default class BaseComponent {
   protected client;
   private name: string;
   private basePath: string;
+
   constructor(protected inputs: any) {
     const libBasePath = this.__getBasePath();
     const pkgPath = path.join(libBasePath, '..', 'package.json');
@@ -86,12 +87,12 @@ export default class BaseComponent {
         },
       ];
       const rows = [];
-      const data = get(result, 'children[0].children', []).filter((item) => item.kindString === 'Method' && get(item, 'flags.isPublic'));
+      const data = _.get(result, 'children[0].children', []).filter((item) => item.kindString === 'Method' && _.get(item, 'flags.isPublic'));
       let cliStr = projectName ? `s ${projectName}` : `s cli ${this.name}`; // 独立组件执行使用cli
       data.forEach((item) => {
-        const params = get(item, 'signatures[0].parameters[0]', {});
-        const paramText = get(params, 'comment.text', '');
-        rows.push([item.name, get(item, 'signatures[0].comment.shortText', ''), paramText, `${cliStr} ${item.name}`]);
+        const params = _.get(item, 'signatures[0].parameters[0]', {});
+        const paramText = _.get(params, 'comment.text', '');
+        rows.push([item.name, _.get(item, 'signatures[0].comment.shortText', ''), paramText, `${cliStr} ${item.name}`]);
       });
 
       return Table(header, rows, options).render();
