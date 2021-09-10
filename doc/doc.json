@@ -19,6 +19,13 @@
 					"kind": 512,
 					"kindString": "Constructor",
 					"flags": {},
+					"sources": [
+						{
+							"fileName": "index.ts",
+							"line": 80,
+							"character": 2
+						}
+					],
 					"signatures": [
 						{
 							"id": 3,
@@ -67,7 +74,7 @@
 						{
 							"fileName": "common/base.ts",
 							"line": 7,
-							"character": 18
+							"character": 12
 						}
 					],
 					"type": {
@@ -91,7 +98,7 @@
 						{
 							"fileName": "index.ts",
 							"line": 78,
-							"character": 23
+							"character": 12
 						}
 					],
 					"type": {
@@ -129,8 +136,8 @@
 					"sources": [
 						{
 							"fileName": "common/base.ts",
-							"line": 32,
-							"character": 7
+							"line": 33,
+							"character": 2
 						}
 					],
 					"signatures": [
@@ -179,8 +186,8 @@
 					"sources": [
 						{
 							"fileName": "common/base.ts",
-							"line": 19,
-							"character": 15
+							"line": 20,
+							"character": 2
 						}
 					],
 					"signatures": [
@@ -216,8 +223,8 @@
 					"sources": [
 						{
 							"fileName": "common/base.ts",
-							"line": 103,
-							"character": 20
+							"line": 104,
+							"character": 12
 						}
 					],
 					"signatures": [
@@ -312,7 +319,7 @@
 						{
 							"fileName": "index.ts",
 							"line": 284,
-							"character": 35
+							"character": 16
 						}
 					],
 					"signatures": [
@@ -363,7 +370,7 @@
 						{
 							"fileName": "index.ts",
 							"line": 379,
-							"character": 21
+							"character": 15
 						}
 					],
 					"signatures": [
@@ -411,7 +418,7 @@
 						{
 							"fileName": "index.ts",
 							"line": 89,
-							"character": 16
+							"character": 10
 						}
 					],
 					"signatures": [
@@ -453,7 +460,7 @@
 						{
 							"fileName": "index.ts",
 							"line": 113,
-							"character": 22
+							"character": 16
 						}
 					],
 					"signatures": [
@@ -512,7 +519,7 @@
 						{
 							"fileName": "index.ts",
 							"line": 134,
-							"character": 21
+							"character": 10
 						}
 					],
 					"signatures": [
@@ -572,7 +579,7 @@
 						{
 							"fileName": "index.ts",
 							"line": 247,
-							"character": 33
+							"character": 16
 						}
 					],
 					"signatures": [
@@ -623,7 +630,7 @@
 						{
 							"fileName": "index.ts",
 							"line": 149,
-							"character": 26
+							"character": 16
 						}
 					],
 					"signatures": [
@@ -722,7 +729,7 @@
 				{
 					"fileName": "index.ts",
 					"line": 77,
-					"character": 34
+					"character": 21
 				}
 			],
 			"extendedTypes": [
