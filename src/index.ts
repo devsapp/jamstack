@@ -28,6 +28,8 @@ mime.define({ 'application/x-yaml; charset=UTF-8': ['yaml'] }, true);
 mime.define({ 'application/javascript; charset=UTF-8': ['js'] }, true);
 mime.define({ 'text/css; charset=UTF-8': ['css'] }, true);
 mime.define({ 'text/markdown; charset=UTF-8': ['md'] }, true);
+mime.define({ 'text/avro': ['avsc'] }, true);
+mime.define({ 'text/proto': ['proto'] }, true);
 
 const MAX_FILE_SIZE = 10485760;
 const CACHE_RULE_REGEXP = new RegExp('[\\-._a-f\\d][a-f\\d]{8}.(js|css|woff|woff2|jpg|jpeg|png|svg)$');
