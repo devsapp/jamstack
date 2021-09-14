@@ -1,7 +1,7 @@
 {
 	"id": 0,
 	"name": "jamstack",
-	"kind": 0,
+	"kind": 1,
 	"kindString": "Project",
 	"flags": {},
 	"originalName": "",
@@ -22,7 +22,7 @@
 					"sources": [
 						{
 							"fileName": "index.ts",
-							"line": 80,
+							"line": 82,
 							"character": 2
 						}
 					],
@@ -97,7 +97,7 @@
 					"sources": [
 						{
 							"fileName": "index.ts",
-							"line": 78,
+							"line": 80,
 							"character": 12
 						}
 					],
@@ -318,7 +318,7 @@
 					"sources": [
 						{
 							"fileName": "index.ts",
-							"line": 284,
+							"line": 286,
 							"character": 16
 						}
 					],
@@ -369,7 +369,7 @@
 					"sources": [
 						{
 							"fileName": "index.ts",
-							"line": 379,
+							"line": 381,
 							"character": 15
 						}
 					],
@@ -417,7 +417,7 @@
 					"sources": [
 						{
 							"fileName": "index.ts",
-							"line": 89,
+							"line": 91,
 							"character": 10
 						}
 					],
@@ -459,7 +459,7 @@
 					"sources": [
 						{
 							"fileName": "index.ts",
-							"line": 113,
+							"line": 115,
 							"character": 16
 						}
 					],
@@ -518,7 +518,7 @@
 					"sources": [
 						{
 							"fileName": "index.ts",
-							"line": 134,
+							"line": 136,
 							"character": 10
 						}
 					],
@@ -578,7 +578,7 @@
 					"sources": [
 						{
 							"fileName": "index.ts",
-							"line": 247,
+							"line": 249,
 							"character": 16
 						}
 					],
@@ -629,7 +629,7 @@
 					"sources": [
 						{
 							"fileName": "index.ts",
-							"line": 149,
+							"line": 151,
 							"character": 16
 						}
 					],
@@ -728,7 +728,7 @@
 			"sources": [
 				{
 					"fileName": "index.ts",
-					"line": 77,
+					"line": 79,
 					"character": 21
 				}
 			],
